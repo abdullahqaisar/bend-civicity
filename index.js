@@ -10,7 +10,7 @@ const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const rideRoutes = require("./routes/ride");
 
-const CONNECTION_STRING = "mongodb://localhost:27017";
+const CONNECTION_STRING = "mongodb+srv://testcivicity:testcivicity@cluster0.feqc265.mongodb.net/?retryWrites=true&w=majority";
 const PORT = process.env.PORT || 5000;
 
 moongose
