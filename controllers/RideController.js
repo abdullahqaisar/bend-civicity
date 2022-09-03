@@ -7,6 +7,10 @@ exports.publishRide = async (req, res) => {
     console.log(req.body);
     console.log(req.user);
     const {
+      startLat,
+      startLong,
+      dropLat,
+      dropLong,
       carId,
       startLocation,
       dropLocation,
@@ -17,8 +21,10 @@ exports.publishRide = async (req, res) => {
 
     const userId = req.user;
     let ride = new Ride({
-      Lat: 43.6556888744308,
-      Long: 93.02181515650089,
+      StartLat: startLat,
+      StartLong: startLong,
+      DropLat: dropLat,
+      DropLong: dropLong,
       StartLocation: startLocation,
       DropLocation: dropLocation,
       TotalSeats: totalSeats,

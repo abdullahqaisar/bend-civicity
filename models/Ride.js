@@ -1,10 +1,16 @@
 const mongoose = require("mongoose");
 
 const RideSchema = new mongoose.Schema({
-  Lat: {
+  StartLat: {
     type: Number,
   },
-  Long: {
+  StartLong: {
+    type: Number,
+  },
+  DropLat: {
+    type: Number,
+  },
+  DropLong: {
     type: Number,
   },
   StartLocation: {
