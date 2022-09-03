@@ -94,6 +94,36 @@ function deg2rad(deg) {
   return deg * (Math.PI / 180);
 }
 
+exports.findDriverCompletedRides = async (req, res) => {
+  const { userId } = req.body;
+
+  const rides = await Ride.find({
+    Driver: userId,
+    RideStatus: true,
+    Completed: true,
+  });
+  if (!rides) {
+    return res.status(500).json({ message: "Error finding the rides" });
+  }
+
+  return res.status(201).json({ rides: rides });
+};
+
+exports.findPassengerCompletedRides = async (req, res) => {
+  const { userId } = req.body;
+
+  const rides = await Ride.find({
+    Passengers: userId,
+    RideStatus: true,
+    Completed: true,
+  });
+  if (!rides) {
+    return res.status(500).json({ message: "Error finding the rides" });
+  }
+
+  return res.status(201).json({ rides: rides });
+};
+
 exports.findRidesByDistance = async (req, res) => {
   try {
     const { lat, long } = req.body;

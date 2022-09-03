@@ -3,7 +3,6 @@ const Car = require("../models/Car");
 
 exports.addCar = async (req, res) => {
   try {
-
     const { carBrand, carModelName, carModelYear } = req.body;
     const newCar = new Car({
       CarBrand: carBrand,
