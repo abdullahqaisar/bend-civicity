@@ -106,7 +106,7 @@ exports.signup = async (req, res) => {
   }
 };
 
-exports.getOtp = async (req, res, next) => {
+exports.getOtp = async (req, res) => {
   try {
     const phoneNumber = req.body.phoneNumber;
     const otp = otpGenerator.generate(6, {
@@ -135,17 +135,18 @@ exports.getOtp = async (req, res, next) => {
       Otp: "123456",
     });
 
-    otpObj = await otp.save();
+    otpObj = await otpObj.save();
     if (!otpObj) {
       console.log("OTP not sent");
       return res.status(400).json({ msg: "Otp not saved!" });
     }
+    console.log(otpObj);
     console.log("OTP sent");
     return res.status(201).json({
       message: "OTP sent!",
     });
   } catch (err) {
-    console.log("OTP not sent");
+    console.log("OTP not sent!");
     res.status(500).json({
       error: err,
     });
