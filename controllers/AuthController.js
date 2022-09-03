@@ -49,7 +49,7 @@ const saveImageToLocal = (phoneNumber, fileName, buffer) => {
 
 exports.signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, phoneNumber, cnicFront, cnicBack } =
+    const { firstName, lastName, email, phoneNumber} =
       req.body;
       console.log(req.body);
     const existingUser = await User.findOne({ Email: email });
@@ -66,24 +66,24 @@ exports.signup = async (req, res) => {
       PhoneNumber: phoneNumber,
     });
 
-    const backImgName = "CnicBack.png";
-    const frontImgName = "CnicFront.png";
+    // const backImgName = "CnicBack.png";
+    // const frontImgName = "CnicFront.png";
 
-    console.log(cnicFront);
-    if (cnicBack !== undefined && cnicFront !== undefined) {
-      const backImgPath = await saveImageToLocal(
-        phoneNumber,
-        backImgName,
-        cnicBack
-      );
-      const frontImgPath = await saveImageToLocal(
-        phoneNumber,
-        frontImgName,
-        cnicFront
-      );
-      newUser.CNICFrontImage = frontImgPath;
-      newUser.CNICBackImage = backImgPath;
-    }
+    // if (cnicBack !== undefined && cnicFront !== undefined) {
+    //   const backImgPath = await saveImageToLocal(
+    //     phoneNumber,
+    //     backImgName,
+    //     cnicBack
+    //   );
+    //   const frontImgPath = await saveImageToLocal(
+    //     phoneNumber,
+    //     frontImgName,
+    //     cnicFront
+    //   );
+    //   newUser.CNICFrontImage = frontImgPath;
+    //   newUser.CNICBackImage = backImgPath;
+    // }
+    
     console.log(newUser);
     const userCreated = await newUser.save();
     if (!userCreated) {
