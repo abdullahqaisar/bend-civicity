@@ -14,6 +14,6 @@ router.delete("/deletecar/:carid", auth, UserController.deleteCar);
 router.post("/addcar", UserController.addCar);
 // router.post("/addcar", CarController.addCar);
 router.get("/getcarbybrands/:carbrand", CarController.getCarsByBrand);
-router.get("/getcarbrands", CarController.getCarBrands);
+router.get("/getcarbrands", auth,CarController.getCarBrands);
 
 module.exports = router;
