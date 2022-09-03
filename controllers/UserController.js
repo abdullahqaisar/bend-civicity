@@ -78,7 +78,6 @@ exports.addCar = async (req, res) => {
       { _id: userId },
       { $push: { Cars: carId } }
     );
-    console.log(user);
     if (!user) {
       return res.status(500).json({
         message: "Can't update user role!",
@@ -86,6 +85,7 @@ exports.addCar = async (req, res) => {
     }
     return res.status(201).json({
       message: "Car Added!",
+      carId: carId,
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -143,6 +143,7 @@ exports.bookRide = async (req, res) => {
     if (!updateRide) {
       return res.status(500).json({
         message: "Error booking the ride!",
+         
       });
     }
 
