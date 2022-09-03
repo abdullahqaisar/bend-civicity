@@ -2,7 +2,6 @@ const User = require("../models/User");
 const Car = require("../models/UserCar");
 const Ride = require("../models/Ride");
 
-
 const saveImageToLocal = (phoneNumber, fileName, buffer) => {
   const trimBuffer = Buffer.from(buffer.split("base64,")[1], "base64");
   let DIR = "uploads/images/" + phoneNumber + "/profilepicture/";
@@ -40,7 +39,11 @@ exports.uploadProfilePicture = async (req, res) => {
       return res.status(201).json({ message: "Error finding user account" });
     }
     const phoneNumber = user.PhoneNumber;
-    const imagePath = saveImageToLocal(phoneNumber, "profilepicture.png", buffer);
+    const imagePath = saveImageToLocal(
+      phoneNumber,
+      "profilepicture.png",
+      buffer
+    );
     user.ProfilePicture = imagePath;
     await user.save();
     return res.status(201).json({ message: "Profile Picture Uploaded" });
@@ -49,16 +52,14 @@ exports.uploadProfilePicture = async (req, res) => {
   }
 };
 
-
-
 exports.addCar = async (req, res) => {
   try {
-    const { liscensePlateNumber, brand, modelName, modelYear, colour } =
+    const { licensePlateNumber, brand, modelName, modelYear, colour } =
       req.body;
 
     const userId = req.user;
     let car = new Car({
-      CarLiscensePlateNumber: liscensePlateNumber,
+      CarLiscensePlateNumber: licensePlateNumber,
       CarBrand: brand,
       CarModelName: modelName,
       CarModelYear: modelYear,
