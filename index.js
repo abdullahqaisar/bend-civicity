@@ -4,6 +4,8 @@ const app = express();
 const moongose = require("mongoose");
 const bodyParser = require("body-parser");
 
+const path = require('path');
+
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const rideRoutes = require("./routes/ride");
@@ -24,6 +26,14 @@ moongose
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 app.use(express.json());
+
+let relativePath = './index.html';
+let absolutePath = path.resolve(relativePath);
+
+app.get("/", function (request, response) {
+  
+  response.sendFile(absolutePath);
+});
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
