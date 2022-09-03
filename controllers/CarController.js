@@ -34,9 +34,10 @@ exports.getCarBrands = async (req, res) => {
         message: "Error getting car brands!",
       });
     }
-    return res.status(201).json({
+    console.log(carBrands)
+    return res.status(201).send(
       carBrands,
-    });
+    );
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
