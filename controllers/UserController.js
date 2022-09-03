@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Car = require("../models/UserCar");
 const Ride = require("../models/Ride");
+var ObjectId = require("mongodb").ObjectId;
 
 const saveImageToLocal = (phoneNumber, fileName, buffer) => {
   const trimBuffer = Buffer.from(buffer.split("base64,")[1], "base64");
@@ -83,6 +84,7 @@ exports.addCar = async (req, res) => {
         message: "Can't update user role!",
       });
     }
+    console.log(carId);
     return res.status(201).json({
       message: "Car Added!",
       carId: carId,
@@ -143,7 +145,6 @@ exports.bookRide = async (req, res) => {
     if (!updateRide) {
       return res.status(500).json({
         message: "Error booking the ride!",
-         
       });
     }
 
@@ -185,11 +186,12 @@ exports.addBio = async (req, res) => {
 
 exports.deleteCar = async (req, res) => {
   try {
-    const carId = req.params.carid;
-    const userId = req.user;
+     const carId = String(req.params.carid);
 
-    const car = await Car.deleteOne({ _id: carId });
-    if (!car.deletedCount) {
+    const userId = req.user;
+    const car = await Car.find({ _id: carId });
+    console.log(car);
+    if (!car) {
       return res.status(404).json({ message: "Car not found!" });
     }
 
