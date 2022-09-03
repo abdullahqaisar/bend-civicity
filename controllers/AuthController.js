@@ -51,6 +51,7 @@ exports.signup = async (req, res) => {
   try {
     const { firstName, lastName, email, phoneNumber, cnicFront, cnicBack } =
       req.body;
+      console.log(req.body);
     const existingUser = await User.findOne({ Email: email });
     if (existingUser) {
       return res
@@ -68,12 +69,22 @@ exports.signup = async (req, res) => {
     const backImgName = "CnicBack.png";
     const frontImgName = "CnicFront.png";
 
-    const backImgPath = await saveImageToLocal(phoneNumber, backImgName, img);
-    const frontImgPath = await saveImageToLocal(phoneNumber, frontImgName, img);
-
-    newUser.CNICFrontImage = frontImgPath;
-    newUser.CNICBackImage = backImgPath;
-
+    console.log(cnicFront);
+    if (cnicBack !== undefined && cnicFront !== undefined) {
+      const backImgPath = await saveImageToLocal(
+        phoneNumber,
+        backImgName,
+        cnicBack
+      );
+      const frontImgPath = await saveImageToLocal(
+        phoneNumber,
+        frontImgName,
+        cnicFront
+      );
+      newUser.CNICFrontImage = frontImgPath;
+      newUser.CNICBackImage = backImgPath;
+    }
+    console.log(newUser);
     const userCreated = await newUser.save();
     if (!userCreated) {
       return res.status(600).json({ msg: "User not saved!" });
@@ -90,6 +101,7 @@ exports.signup = async (req, res) => {
       token: token,
     });
   } catch (e) {
+    console.log(e);
     res.status(500).json({ error: e.message });
   }
 };
