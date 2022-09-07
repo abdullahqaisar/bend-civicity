@@ -45,12 +45,17 @@ const RideSchema = new mongoose.Schema({
   RideStatus: {
     type: Boolean,
     default: false,
-  },
+  }, // false means not started, true means started
 
   Completed: {
     type: Boolean,
     default: false,
-  },
+  }, // false means not completed, true means completed
+
+  Cancelled: {
+    type: Boolean,
+    default: false,
+  }, // false means not cancelled, true means cancelled
 
   StartTime: {
     type: String,
@@ -61,6 +66,9 @@ const RideSchema = new mongoose.Schema({
     ref: "User",
   },
 
+  Rating: {
+    type: Number,
+  },
   Car: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Car",

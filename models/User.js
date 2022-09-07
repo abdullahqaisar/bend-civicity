@@ -46,6 +46,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
   },
 
+  Rating: {
+    type: Number,
+  },
+
+
   ActiveRide: {
     type: Boolean,
     default: false,

@@ -15,5 +15,6 @@ router.post("/addcar", auth, UserController.addCar);
 // router.post("/addcar", CarController.addCar);
 router.get("/getcarbybrands/:carbrand", CarController.getCarsByBrand);
 router.get("/getcarbrands", CarController.getCarBrands);
+router.patch("/uploadprofilepicture", UserController.uploadProfilePicture);
 
 module.exports = router;

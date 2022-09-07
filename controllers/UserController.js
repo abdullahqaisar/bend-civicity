@@ -1,6 +1,12 @@
 const User = require("../models/User");
 const Car = require("../models/UserCar");
 const Ride = require("../models/Ride");
+
+const path = require("path");
+
+var fs = require("fs");
+var fs = require("fs-extra");
+
 var ObjectId = require("mongodb").ObjectId;
 
 const saveImageToLocal = (phoneNumber, fileName, buffer) => {
@@ -23,7 +29,7 @@ exports.getUser = async (req, res) => {
     const userId = req.body.userId;
     const user = await User.findById({ _id: userId });
     if (!user) {
-      return res.status(201).json({ message: "Error finding user account" });
+      return res.status(401).json({ message: "Error finding user account" });
     }
     return res.status(201).send(user);
   } catch (e) {
@@ -33,7 +39,8 @@ exports.getUser = async (req, res) => {
 
 exports.uploadProfilePicture = async (req, res) => {
   try {
-    const userId = req.user;
+    // const userId = req.user;
+    const userId = "630fc860feb366a99f31e0a4";
     const buffer = req.body.image;
     const user = await User.findById({ _id: userId });
     if (!user) {
@@ -186,11 +193,10 @@ exports.addBio = async (req, res) => {
 
 exports.deleteCar = async (req, res) => {
   try {
-     const carId = String(req.params.carid);
+    const carId = String(req.params.carid);
 
     const userId = req.user;
     const car = await Car.find({ _id: carId });
-    console.log(car);
     if (!car) {
       return res.status(404).json({ message: "Car not found!" });
     }

@@ -11,9 +11,6 @@ require("dotenv").config();
 
 const User = require("../models/User");
 const Otp = require("../models/Otp");
-const { dir } = require("console");
-
-var getDirName = require("path").dirname;
 
 const SID = "AC2a212051632cb6bb0f0644deb2a7b25b";
 const AUTH_TOKEN = "e080facc80d9285e2ff476a9eeec38af";

@@ -4,13 +4,17 @@ const app = express();
 const moongose = require("mongoose");
 const bodyParser = require("body-parser");
 
-const path = require('path');
+const path = require("path");
+require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const rideRoutes = require("./routes/ride");
+const adminRoutes = require("./routes/admin");
 
-const CONNECTION_STRING = "mongodb+srv://testcivicity:testcivicity@cluster0.feqc265.mongodb.net/?retryWrites=true&w=majority";
+// const CONNECTION_STRING = "mongodb+srv://testcivicity:testcivicity@cluster0.feqc265.mongodb.net/?retryWrites=true&w=majority";
+const CONNECTION_STRING = "mongodb://localhost:27017/test";
+
 const PORT = process.env.PORT || 5000;
 
 moongose
@@ -27,14 +31,14 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 app.use(express.json());
 
-let relativePath = './index.html';
+let relativePath = "./index.html";
 let absolutePath = path.resolve(relativePath);
 
 app.get("/", function (request, response) {
-  
   response.sendFile(absolutePath);
 });
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/ride", rideRoutes);
+app.use("/admin", adminRoutes);

@@ -46,6 +46,7 @@ exports.publishRide = async (req, res) => {
       { _id: carId },
       { IsCarInRide: true }
     );
+
     if (!car) {
       return res.status(400).json({
         message: "Error adding the ride!",
@@ -123,6 +124,7 @@ exports.findPassengerCompletedRides = async (req, res) => {
     RideStatus: true,
     Completed: true,
   });
+
   if (!rides) {
     return res.status(500).json({ message: "Error finding the rides" });
   }
@@ -158,6 +160,40 @@ exports.findRidesByDistance = async (req, res) => {
     console.log(e.message);
     return res.status(500).json({ error: e.message });
   }
+};
+
+exports.cancelRide = async (req, res) => {
+  const { rideId } = req.body;
+  const ride = await Ride.findByIdAndUpdate(
+    { _id: rideId },
+    { Cancelled: true }
+  );
+  if (!ride) {
+    return res.status(500).json({ message: "Error cancelling the ride" });
+  }
+
+  const car = await Car.findByIdAndUpdate(
+    { _id: ride.Car },
+    { IsCarInRide: false }
+  );
+
+  if (!car) {
+    return res.status(500).json({ message: "Error cancelling the ride" });
+  }
+
+  return res.status(201).json({ message: "Ride Cancelled!" });
+};
+
+exports.addRating = async (req, res) => {
+  const { rideId, rating } = req.body;
+  const ride = await Ride.findByIdAndUpdate(
+    { _id: rideId },
+    { Rating: rating }
+  );
+  if (!ride) {
+    return res.status(500).json({ message: "Error adding the rating" });
+  }
+  return res.status(201).json({ message: "Rating Added!" });
 };
 
 exports.findRides = async (req, res) => {
