@@ -1,44 +1,40 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const moongose = require("mongoose");
+const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 
 const path = require("path");
 require("dotenv").config();
 
-const authRoutes = require("./routes/auth");
-const userRoutes = require("./routes/user");
-const rideRoutes = require("./routes/ride");
-const adminRoutes = require("./routes/admin");
+const authRoutes = require("./src/routes/auth");
+const userRoutes = require("./src/routes/user");
+const rideRoutes = require("./src/routes/ride");
+const adminRoutes = require("./src/routes/admin");
 
-// const CONNECTION_STRING = "mongodb+srv://testcivicity:testcivicity@cluster0.feqc265.mongodb.net/?retryWrites=true&w=majority";
-const CONNECTION_STRING = "mongodb://localhost:27017/test";
+let relativePath = "./index.html";
+let absolutePath = path.resolve(relativePath);
 
-const PORT = process.env.PORT || 5000;
-
-moongose
-  .connect(CONNECTION_STRING)
-  .then((result) => {
-    console.log("Server is running on port " + PORT);
-    app.listen(PORT);
+mongoose
+  .connect(process.env.DATABASE_CONNECTION)
+  .then(() => {
+    console.log("Server is running on port " + process.env.PORT);
+    app.listen(process.env.PORT);
   })
   .catch((err) => {
     console.log(err);
   });
 
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 app.use(cors());
 app.use(express.json());
-
-let relativePath = "./index.html";
-let absolutePath = path.resolve(relativePath);
-
-app.get("/", function (request, response) {
-  response.sendFile(absolutePath);
-});
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/ride", rideRoutes);
 app.use("/admin", adminRoutes);
+
+app.get("/", (req, res) => {
+  res.sendFile(absolutePath);
+});
+

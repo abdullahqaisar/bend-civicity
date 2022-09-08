@@ -7,6 +7,19 @@ const Admin = require("../models/Admin");
 const User = require("../models/User");
 const Ride = require("../models/Ride");
 
+function convertImageToBase64(image) {
+  return new Promise((resolve, reject) => {
+    const fs = require("fs");
+    fs.readFile(image, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data.toString("base64"));
+      }
+    });
+  });
+}
+
 exports.signup = async (req, res) => {
   try {
     const { email, password, firstName, lastName } = req.body;
@@ -164,4 +177,3 @@ exports.getSingleRide = async (req, res) => {
     return res.status(500).json({ error: e.message });
   }
 };
-

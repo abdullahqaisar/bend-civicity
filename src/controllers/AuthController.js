@@ -1,54 +1,22 @@
-const express = require("express");
 const moongose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const otpGenerator = require("otp-generator"); //Generate OTP
-var fs = require("fs");
-const path = require("path");
-var fs = require("fs-extra");
-// import { getAuth, signInWithPhoneNumber } from "firebase/auth";
 
-require("dotenv").config();
+const jwt = require("jsonwebtoken");
+
+const otpGenerator = require("otp-generator"); //Generate OTP
+const twilio = require("twilio")(process.env.SID, process.env.AUTH_TOKEN);
 
 const User = require("../models/User");
 const Otp = require("../models/Otp");
 
-const SID = "AC2a212051632cb6bb0f0644deb2a7b25b";
-const AUTH_TOKEN = "e080facc80d9285e2ff476a9eeec38af";
+require("dotenv").config();
 
-const twilio = require("twilio")(SID, AUTH_TOKEN);
-
-// exports.image = async (req, res) => {
-//   let base64Image = img.split(";base64,").pop();
-//   fs.writeFile(
-//     "image.png",
-//     base64Image,
-//     { encoding: "base64" },
-//     function (err) {
-//       console.log("File created");
-//     }
-//   );
-// };
-
-const saveImageToLocal = (phoneNumber, fileName, buffer) => {
-  const trimBuffer = Buffer.from(buffer.split("base64,")[1], "base64");
-  let DIR = "uploads/images/" + phoneNumber + "/cnic/";
-  fileurl = path.join(DIR, fileName);
-  fs.outputFile(fileurl, trimBuffer, { encoding: "base64" }, function (err) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(fileName + " uploaded");
-    }
-  });
-  const url = String(fileurl);
-  return url;
-};
+const storeImage = require("../helpers/storeImageToServer").storeImage;
 
 exports.signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, phoneNumber} =
+    const { firstName, lastName, email, phoneNumber, cnicBack, cnicFront } =
       req.body;
-      console.log(req.body);
+    console.log(req.body);
     const existingUser = await User.findOne({ Email: email });
     if (existingUser) {
       return res
@@ -63,24 +31,17 @@ exports.signup = async (req, res) => {
       PhoneNumber: phoneNumber,
     });
 
-    // const backImgName = "CnicBack.png";
-    // const frontImgName = "CnicFront.png";
+    let directory = "uploads/images/" + phoneNumber + "/cnic/";
+    const backImgName = "CnicBack.png";
+    const frontImgName = "CnicFront.png";
 
-    // if (cnicBack !== undefined && cnicFront !== undefined) {
-    //   const backImgPath = await saveImageToLocal(
-    //     phoneNumber,
-    //     backImgName,
-    //     cnicBack
-    //   );
-    //   const frontImgPath = await saveImageToLocal(
-    //     phoneNumber,
-    //     frontImgName,
-    //     cnicFront
-    //   );
-    //   newUser.CNICFrontImage = frontImgPath;
-    //   newUser.CNICBackImage = backImgPath;
-    // }
-    
+    if (cnicBack !== undefined && cnicFront !== undefined) {
+      const backImgPath = await storeImage(backImgName, cnicBack, directory);
+      const frontImgPath = await storeImage(frontImgName, cnicFront, directory);
+      newUser.CNICFrontImage = frontImgPath;
+      newUser.CNICBackImage = backImgPath;
+    }
+
     console.log(newUser);
     const userCreated = await newUser.save();
     if (!userCreated) {
@@ -192,20 +153,3 @@ exports.verifyOtp = async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 };
-
-// exports.signUpFirebase = async (req, res) => {
-//   const phoneNumber = "+923100868589";
-//   const appVerifier = window.recaptchaVerifier;
-
-//   const auth = getAuth();
-//   signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-//     .then((confirmationResult) => {
-//       console.log("OTP Verified");
-//       window.confirmationResult = confirmationResult;
-//       // ...
-//     })
-//     .catch((error) => {
-//       // Error; SMS not sent
-//       // ...
-//     });
-// };

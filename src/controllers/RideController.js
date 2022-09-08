@@ -2,6 +2,8 @@ const User = require("../models/User");
 const Car = require("../models/UserCar");
 const Ride = require("../models/Ride");
 
+var calculateDistance = require("../helpers/calculateDistanceFromCoordinates").calculateDistance;
+
 exports.publishRide = async (req, res) => {
   try {
     console.log(req.body);
@@ -82,25 +84,6 @@ exports.startRide = async (req, res) => {
   return res.status(201).json({ message: "Ride Started!" });
 };
 
-function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
-  var radius = 6371;
-  var dLat = deg2rad(lat2 - lat1);
-  var dLon = deg2rad(lon2 - lon1);
-  var a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2rad(lat1)) *
-      Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  var d = radius * c;
-  return d;
-}
-
-function deg2rad(deg) {
-  return deg * (Math.PI / 180);
-}
-
 exports.findDriverCompletedRides = async (req, res) => {
   const { userId } = req.body;
 
@@ -145,13 +128,10 @@ exports.findRidesByDistance = async (req, res) => {
       return res.status(500).json({ message: "Error finding rides" });
     }
     var filteredRides = rides.filter((ride) => {
-      const distanceFromRide = getDistanceFromLatLon(
-        lat,
-        long,
-        ride.Lat,
-        ride.Long
-      );
-      if (distanceFromRide <= 10) {
+      //Find if ride is within 10km range
+      const findDistance = calculateDistance(lat, long, ride.Lat, ride.Long);
+      console.log(findDistance);
+      if (findDistance <= 10) {
         return ride;
       }
     });
