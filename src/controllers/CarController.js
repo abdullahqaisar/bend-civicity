@@ -1,4 +1,4 @@
-const UserCar = require("../models/UserCar");
+const UserCar = require("../models/Car");
 const Car = require("../models/Car");
 
 

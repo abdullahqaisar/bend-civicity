@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const Car = require("../models/UserCar");
+const Car = require("../models/Car");
 const Ride = require("../models/Ride");
 
 const storeImage = require("../helpers/storeImageToServer").storeImage;
