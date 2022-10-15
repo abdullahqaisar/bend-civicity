@@ -80,6 +80,7 @@ exports.checkAccount = async (req, res) => {
     return res.status(201).json({
       message: "Login successful!",
       token: token,
+      user: user,
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
