@@ -25,9 +25,9 @@ exports.signup = async (req, res) => {
     });
     cnicBack = "data:image/png;base64,"+cnicBack;
     cnicFront = "data:image/png;base64,"+cnicFront;
-    let directory = "uploads/images/" + phoneNumber + "/cnic/";
-    const backImgName = "CnicBack.png";
-    const frontImgName = "CnicFront.png";
+    // let directory = "uploads/images/" + phoneNumber + "/cnic/";
+    // const backImgName = "CnicBack.png";
+    // const frontImgName = "CnicFront.png";
 
     // if (cnicBack !== undefined && cnicFront !== undefined) {
     //   const backImgPath = await storeImage(backImgName, cnicBack, directory);
@@ -35,7 +35,8 @@ exports.signup = async (req, res) => {
     //   newUser.CnicFront = frontImgPath;
     //   newUser.CnicBack = backImgPath;
     // }
-
+    newUser.CnicFront = cnicFront;
+    newUser.CnicBack = cnicBack;
     const userCreated = await newUser.save();
     if (!userCreated) {
       return res.status(500).json({ msg: "User not saved!" });
