@@ -87,7 +87,7 @@ exports.checkAccount = async (req, res) => {
       bio: user.Bio,
       rating: user.Rating,
       licenseVerifiedStatus: user.LicenseVerifiedStatus,
-      cnicVerifiedStatus: user.CnicVerifiedStatus,
+      cnicVerifiedStatus: user.CNICVerifiedStatus,
       emailVerifiedStatus: user.EmailVerifiedStatus,
       cars: user.Cars,
     });
