@@ -141,9 +141,9 @@ exports.addCar = async (req, res) => {
       return res.status(401).json({ message: "Error finding user account" });
     }
 
-    if (user.LicenseVerifiedStatus !== "Verified") {
-      return res.status(401).json({ message: "License not verified" });
-    }
+    // if (user.LicenseVerifiedStatus !== "Verified") {
+    //   return res.status(401).json({ message: "License not verified" });
+    // }
 
     const {
       licensePlateNumber,
@@ -151,7 +151,6 @@ exports.addCar = async (req, res) => {
       modelName,
       modelYear,
       colour,
-      carImageBuffer,
       fuelAverage,      
     } = req.body;
 
