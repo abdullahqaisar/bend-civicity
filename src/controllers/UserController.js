@@ -2,27 +2,7 @@ const User = require("../models/User");
 const Car = require("../models/UserCar");
 const Ride = require("../models/Ride");
 
-const path = require("path");
-
-var fs = require("fs");
-var fs = require("fs-extra");
-
-var ObjectId = require("mongodb").ObjectId;
-
-const saveImageToLocal = (phoneNumber, fileName, buffer) => {
-  const trimBuffer = Buffer.from(buffer.split("base64,")[1], "base64");
-  let DIR = "uploads/images/" + phoneNumber + "/profilepicture/";
-  fileurl = path.join(DIR, fileName);
-  fs.outputFile(fileurl, trimBuffer, { encoding: "base64" }, function (err) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(fileName + " uploaded");
-    }
-  });
-  const url = String(fileurl);
-  return url;
-};
+const storeImage = require("../helpers/storeImageToServer").storeImage;
 
 exports.getUser = async (req, res) => {
   try {
@@ -46,12 +26,11 @@ exports.uploadProfilePicture = async (req, res) => {
     if (!user) {
       return res.status(201).json({ message: "Error finding user account" });
     }
+
     const phoneNumber = user.PhoneNumber;
-    const imagePath = saveImageToLocal(
-      phoneNumber,
-      "profilepicture.png",
-      buffer
-    );
+    let directory = "uploads/images/" + phoneNumber + "/profilepicture/";
+    const imagePath = storeImage("profilepicture.png", buffer, directory);
+
     user.ProfilePicture = imagePath;
     await user.save();
     return res.status(201).json({ message: "Profile Picture Uploaded" });
@@ -60,12 +39,122 @@ exports.uploadProfilePicture = async (req, res) => {
   }
 };
 
+exports.payByVisaCard = async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const user = await User.findById({ _id: userId });
+    if (!user) {
+      return res.status(401).json({ message: "Error finding user account" });
+    }
+    const rideId = req.body.rideId;
+    const ride = await Ride.findById({ _id: rideId });
+    if (!ride) {
+      return res.status(401).json({ message: "Error finding ride" });
+    }
+    const amount = req.body.amount;
+    const cardNumber = req.body.cardNumber;
+    const cardHolderName = req.body.cardHolderName;
+    const expiryDate = req.body.expiryDate;
+    const cvv = req.body.cvv;
+    const card = {
+      cardNumber: cardNumber,
+      cardHolderName: cardHolderName,
+      expiryDate: expiryDate,
+      cvv: cvv,
+    };
+    const payment = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: "usd",
+      payment_method_types: ["card"],
+      card: card,
+    });
+    if (!payment) {
+      return res.status(401).json({ message: "Error making payment" });
+    }
+    ride.PaymentStatus = "Paid";
+    await ride.save();
+    return res.status(201).json({ message: "Payment Successful" });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+exports.payByEasyPaisa = async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const user = await User.findById({ _id: userId });
+    if (!user) {
+      return res.status(401).json({ message: "Error finding user account" });
+    }
+    const rideId = req.body.rideId;
+    const ride = await Ride.findById({ _id: rideId });
+    if (!ride) {
+      return res.status(401).json({ message: "Error finding ride" });
+    }
+    const amount = req.body.amount;
+    const easyPaisaNumber = req.body.easyPaisaNumber;
+    const easyPaisa = {
+      easyPaisaNumber: easyPaisaNumber,
+    };
+    const payment = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: "usd",
+      payment_method_types: ["card"],
+      easyPaisa: easyPaisa,
+    });
+    if (!payment) {
+      return res.status(401).json({ message: "Error making payment" });
+    }
+    ride.PaymentStatus = "Paid";
+    await ride.save();
+    return res.status(201).json({ message: "Payment Successful" });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+exports.verifyLicenseImage = async (req, res) => {
+  try {
+    const userId = req.user;
+    const user = await User.findById({ _id: userId });
+    if (!user) {
+      return res.status(401).json({ message: "Error finding user account" });
+    }
+    const licenseImagebuffer = req.body.image;
+    const phoneNumber = user.PhoneNumber;
+    let directory = "uploads/images/" + phoneNumber + "/license/";
+    const imagePath = storeImage("license.png", licenseImagebuffer, directory);
+    user.LicenseImage = imagePath;
+    user.LicenseVerifiedStatus = "Pending";
+    await user.save();
+    return res.status(201).json({ message: "License Image Uploaded" });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
 exports.addCar = async (req, res) => {
   try {
-    const { licensePlateNumber, brand, modelName, modelYear, colour } =
-      req.body;
-
     const userId = req.user;
+    let user = await User.findById({ _id: userId });
+    if (!user) {
+      return res.status(401).json({ message: "Error finding user account" });
+    }
+
+    if (user.LicenseVerifiedStatus !== "Verified") {
+      return res.status(401).json({ message: "License not verified" });
+    }
+
+    const {
+      licensePlateNumber,
+      brand,
+      modelName,
+      modelYear,
+      colour,
+      carImageBuffer,
+      fuelAverage,      
+    } = req.body;
+
     let car = new Car({
       CarLiscensePlateNumber: licensePlateNumber,
       CarBrand: brand,
@@ -73,7 +162,21 @@ exports.addCar = async (req, res) => {
       CarModelYear: modelYear,
       CarColour: colour,
       UserId: userId,
+      CarImg: carImage,
+      FuelAverage: fuelAverage,
     });
+
+    let directory = "uploads/images/" + phoneNumber + "/car/";
+    const carImageName = car._id + "Car.png";
+
+    if (carImage !== undefined) {
+      const carImgPath = await storeImage(
+        carImageName,
+        carImageBuffer,
+        directory
+      );
+      newUser.CnicFront = carImgPath;
+    }
 
     car = await car.save();
     if (!car) {
@@ -82,13 +185,13 @@ exports.addCar = async (req, res) => {
       });
     }
     const carId = car._id;
-    const user = await User.findOneAndUpdate(
+    user = await User.findOneAndUpdate(
       { _id: userId },
       { $push: { Cars: carId } }
     );
     if (!user) {
       return res.status(500).json({
-        message: "Can't update user role!",
+        message: "Error pushing car to user!",
       });
     }
     console.log(carId);

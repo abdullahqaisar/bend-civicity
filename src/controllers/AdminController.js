@@ -7,18 +7,20 @@ const Admin = require("../models/Admin");
 const User = require("../models/User");
 const Ride = require("../models/Ride");
 
-function convertImageToBase64(image) {
-  return new Promise((resolve, reject) => {
-    const fs = require("fs");
-    fs.readFile(image, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data.toString("base64"));
-      }
+const convertImage = require("../helpers/convertImageToBase64").convertImage;
+
+exports.image = async (req, res) => {
+  try {
+    const path = "uploads/images/03343046353/cnic/CnicBack.png";
+    let buffer = await convertImage(path);
+    buffer = "data:image/png;base64," + i;
+    return res.status(200).json({
+      image: buffer,
     });
-  });
-}
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
 
 exports.signup = async (req, res) => {
   try {

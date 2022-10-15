@@ -50,17 +50,25 @@ const UserSchema = new mongoose.Schema({
     type: Number,
   },
 
-
   ActiveRide: {
     type: Boolean,
     default: false,
   },
 
-  CNICFrontImage: {
+  LicenseImage: {
+    type: String,
+  },
+  
+  LicenseVerifiedStatus: {
+    type: String,
+    default: "False",
+  },
+
+  CnicFront: {
     type: String,
   },
 
-  CNICBackImage: {
+  CnicBack: {
     type: String,
   },
 });

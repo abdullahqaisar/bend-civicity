@@ -1,6 +1,8 @@
 const UserCar = require("../models/UserCar");
 const Car = require("../models/Car");
 
+
+
 exports.addCar = async (req, res) => {
   try {
     const { carBrand, carModelName, carModelYear } = req.body;
@@ -34,10 +36,8 @@ exports.getCarBrands = async (req, res) => {
         message: "Error getting car brands!",
       });
     }
-    console.log(carBrands)
-    return res.status(201).send(
-      carBrands,
-    );
+    console.log(carBrands);
+    return res.status(201).send(carBrands);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

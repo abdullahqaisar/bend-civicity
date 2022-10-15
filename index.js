@@ -4,16 +4,12 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 
-const path = require("path");
 require("dotenv").config();
 
 const authRoutes = require("./src/routes/auth");
 const userRoutes = require("./src/routes/user");
 const rideRoutes = require("./src/routes/ride");
 const adminRoutes = require("./src/routes/admin");
-
-let relativePath = "./index.html";
-let absolutePath = path.resolve(relativePath);
 
 mongoose
   .connect(process.env.DATABASE_CONNECTION)
@@ -33,8 +29,3 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/ride", rideRoutes);
 app.use("/admin", adminRoutes);
-
-app.get("/", (req, res) => {
-  res.sendFile(absolutePath);
-});
-

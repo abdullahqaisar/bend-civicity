@@ -38,11 +38,10 @@ exports.signup = async (req, res) => {
     if (cnicBack !== undefined && cnicFront !== undefined) {
       const backImgPath = await storeImage(backImgName, cnicBack, directory);
       const frontImgPath = await storeImage(frontImgName, cnicFront, directory);
-      newUser.CNICFrontImage = frontImgPath;
-      newUser.CNICBackImage = backImgPath;
+      newUser.CnicFront = frontImgPath;
+      newUser.CnicBack = backImgPath;
     }
 
-    console.log(newUser);
     const userCreated = await newUser.save();
     if (!userCreated) {
       return res.status(600).json({ msg: "User not saved!" });

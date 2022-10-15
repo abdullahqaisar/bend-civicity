@@ -37,6 +37,10 @@ const RideSchema = new mongoose.Schema({
     required: true,
   },
 
+  TotalDistance: {
+    type: Number,
+  },
+
   PublishingTime: {
     type: Date,
     default: Date.now,
@@ -69,6 +73,9 @@ const RideSchema = new mongoose.Schema({
   Rating: {
     type: Number,
   },
+  MaxLuggage: {
+    type: Number,
+  },
   Car: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Car",
@@ -82,6 +89,27 @@ const RideSchema = new mongoose.Schema({
       },
       Seats: {
         type: Number,
+      },
+    },
+  ],
+
+  Offers: [
+    {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+      },
+      Price: {
+        type: Number,
+      },
+      Seats: {
+        type: Number,
+      },
+      Luggage: {
+        type: Number,
+      },
+      User: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
       },
     },
   ],
