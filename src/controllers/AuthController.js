@@ -14,7 +14,7 @@ const storeImage = require("../helpers/storeImageToServer").storeImage;
 
 exports.signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, phoneNumber, cnicBack, cnicFront } =
+    let { firstName, lastName, email, phoneNumber, cnicBack, cnicFront } =
       req.body;
     const newUser = new User({
       _id: new moongose.Types.ObjectId(),
