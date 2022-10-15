@@ -29,12 +29,12 @@ exports.signup = async (req, res) => {
     const backImgName = "CnicBack.png";
     const frontImgName = "CnicFront.png";
 
-    if (cnicBack !== undefined && cnicFront !== undefined) {
-      const backImgPath = await storeImage(backImgName, cnicBack, directory);
-      const frontImgPath = await storeImage(frontImgName, cnicFront, directory);
-      newUser.CnicFront = frontImgPath;
-      newUser.CnicBack = backImgPath;
-    }
+    // if (cnicBack !== undefined && cnicFront !== undefined) {
+    //   const backImgPath = await storeImage(backImgName, cnicBack, directory);
+    //   const frontImgPath = await storeImage(frontImgName, cnicFront, directory);
+    //   newUser.CnicFront = frontImgPath;
+    //   newUser.CnicBack = backImgPath;
+    // }
 
     const userCreated = await newUser.save();
     if (!userCreated) {
