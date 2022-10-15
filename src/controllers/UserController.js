@@ -151,7 +151,7 @@ exports.addCar = async (req, res) => {
       modelName,
       modelYear,
       colour,
-      fuelAverage,      
+      fuelAverage,
     } = req.body;
 
     let car = new Car({
@@ -297,19 +297,18 @@ exports.addBio = async (req, res) => {
 exports.addPreferences = async (req, res) => {
   try {
     const userId = req.user;
-    const {
-      smoking,
-      music,
-      pets,
-    } = req.body;
+    const { smoking, music, pets } = req.body;
     console.log(req.body);
-    const user = await User.findOneAndUpdate({ _id: userId }, { Smoking: smoking, Music: music, Pets: pets });
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $push: { Preferences: { Smoking: smoking, Music: music, Pets: pets } } }
+    );
     if (!user) {
       return res.status(500).json({
         message: "An Error occoured while adding preferences!",
       });
     }
-    
+
     return res.status(201).json({
       message: "Preferences Added!",
     });
@@ -318,7 +317,6 @@ exports.addPreferences = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
-
 
 exports.deleteCar = async (req, res) => {
   try {
