@@ -277,6 +277,8 @@ exports.bookRide = async (req, res) => {
 
 exports.addBio = async (req, res) => {
   try {
+    console.log(req.body);
+    console.log(req.user);
     const bio = req.body.bio;
     const userId = req.user;
     const user = await User.findOneAndUpdate({ _id: userId }, { Bio: bio });
