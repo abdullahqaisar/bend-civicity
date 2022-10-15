@@ -281,8 +281,8 @@ exports.addBio = async (req, res) => {
     const userId = req.user;
     const user = await User.findOneAndUpdate({ _id: userId }, { Bio: bio });
     if (!user) {
-      return res.status(400).json({
-        message: "An Error occoured!",
+      return res.status(500).json({
+        message: "An Error occoured while adding user!",
       });
     }
     return res.status(201).json({
