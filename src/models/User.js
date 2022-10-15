@@ -53,7 +53,7 @@ const UserSchema = new mongoose.Schema({
   // LicenseImage: {
   //   type: String,
   // },
-  
+
   LicenseVerifiedStatus: {
     type: String,
     default: "False",
@@ -76,7 +76,6 @@ const UserSchema = new mongoose.Schema({
   CnicBack: {
     type: String,
   },
-
 });
 
 const User = mongoose.model("User", UserSchema);
