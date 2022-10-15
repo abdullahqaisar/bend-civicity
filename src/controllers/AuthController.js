@@ -23,7 +23,8 @@ exports.signup = async (req, res) => {
       Email: email,
       PhoneNumber: phoneNumber,
     });
-
+    cnicBack = "data:image/png;base64,"+cnicBack;
+    cnicFront = "data:image/png;base64,"+cnicFront;
     let directory = "uploads/images/" + phoneNumber + "/cnic/";
     const backImgName = "CnicBack.png";
     const frontImgName = "CnicFront.png";
