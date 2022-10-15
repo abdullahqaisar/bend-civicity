@@ -7,6 +7,7 @@ const CarController = require("../controllers/CarController");
 const auth = require("../middleware/auth");
 
 router.patch("/addbio", auth, UserController.addBio);
+router.patch("/addpreferences", auth, UserController.addPreferences);
 router.get("/getuser", auth, UserController.getUser);
 router.get("/getpulishedrides/:id", auth, UserController.getPublishedRides);
 router.patch("/bookride", auth, UserController.bookRide);

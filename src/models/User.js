@@ -42,6 +42,8 @@ const UserSchema = new mongoose.Schema({
     default: "",
   },
 
+  Preferences: [{ smoking: Number, pets: Number, music: Number }],
+
   Rating: {
     type: Number,
     default: 0,
@@ -51,7 +53,6 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-
 
   ProfileImage: {
     type: String,

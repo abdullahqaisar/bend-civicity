@@ -294,6 +294,31 @@ exports.addBio = async (req, res) => {
   }
 };
 
+exports.addPreferences = async (req, res) => {
+  try {
+    const userId = req.user;
+    const {
+      smoking,
+      music,
+      pets,
+    } = req.body;
+    const user = await User.findOneAndUpdate({ _id: userId }, { Smoking: smoking, Music: music, Pets: pets });
+    if (!user) {
+      return res.status(500).json({
+        message: "An Error occoured while adding user!",
+      });
+    }
+    
+    return res.status(201).json({
+      message: "Preferences Added!",
+    });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+
 exports.deleteCar = async (req, res) => {
   try {
     const carId = String(req.params.carid);
