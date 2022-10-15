@@ -50,6 +50,11 @@ const UserSchema = new mongoose.Schema({
     default: false,
   },
 
+
+  ProfileImage: {
+  //   type: String,
+  },
+
   // LicenseImage: {
   //   type: String,
   // },

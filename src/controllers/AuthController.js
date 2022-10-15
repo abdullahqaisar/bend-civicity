@@ -90,6 +90,7 @@ exports.checkAccount = async (req, res) => {
       cnicVerifiedStatus: user.CNICVerifiedStatus,
       emailVerifiedStatus: user.EmailVerifiedStatus,
       cars: user.Cars,
+      profileImage: user.ProfileImage,
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
