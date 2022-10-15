@@ -66,6 +66,7 @@ exports.signup = async (req, res) => {
 exports.checkAccount = async (req, res) => {
   try {
     const { phoneNumber } = req.body;
+    console.log(req.body);
     const user = await User.findOne({ PhoneNumber: phoneNumber });
     if (!user) {
       return res.status(401).json({ message: "Account does not exist! Please proceed to signup" });
