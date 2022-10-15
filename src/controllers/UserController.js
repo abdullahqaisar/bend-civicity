@@ -161,21 +161,20 @@ exports.addCar = async (req, res) => {
       CarModelYear: modelYear,
       CarColour: colour,
       UserId: userId,
-      CarImg: carImage,
       FuelAverage: fuelAverage,
     });
 
-    let directory = "uploads/images/" + phoneNumber + "/car/";
-    const carImageName = car._id + "Car.png";
+    // let directory = "uploads/images/" + phoneNumber + "/car/";
+    // const carImageName = car._id + "Car.png";
 
-    if (carImage !== undefined) {
-      const carImgPath = await storeImage(
-        carImageName,
-        carImageBuffer,
-        directory
-      );
-      newUser.CnicFront = carImgPath;
-    }
+    // if (carImage !== undefined) {
+    //   const carImgPath = await storeImage(
+    //     carImageName,
+    //     carImageBuffer,
+    //     directory
+    //   );
+    //   newUser.CnicFront = carImgPath;
+    // }
 
     car = await car.save();
     if (!car) {
