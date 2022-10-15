@@ -16,7 +16,6 @@ exports.signup = async (req, res) => {
   try {
     const { firstName, lastName, email, phoneNumber, cnicBack, cnicFront } =
       req.body;
-    console.log(req.body);
     const newUser = new User({
       _id: new moongose.Types.ObjectId(),
       FirstName: firstName,
