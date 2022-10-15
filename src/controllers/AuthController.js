@@ -17,12 +17,6 @@ exports.signup = async (req, res) => {
     const { firstName, lastName, email, phoneNumber, cnicBack, cnicFront } =
       req.body;
     console.log(req.body);
-    const existingUser = await User.findOne({ Email: email });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ msg: "User with same email already exists!" });
-    }
     const newUser = new User({
       _id: new moongose.Types.ObjectId(),
       FirstName: firstName,
@@ -44,7 +38,7 @@ exports.signup = async (req, res) => {
 
     const userCreated = await newUser.save();
     if (!userCreated) {
-      return res.status(600).json({ msg: "User not saved!" });
+      return res.status(500).json({ msg: "User not saved!" });
     }
     const token = await jwt.sign(
       {
