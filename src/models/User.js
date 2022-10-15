@@ -39,10 +39,12 @@ const UserSchema = new mongoose.Schema({
 
   Bio: {
     type: String,
+    default: "",
   },
 
   Rating: {
     type: Number,
+    default: 0,
   },
 
   ActiveRide: {
