@@ -282,7 +282,7 @@ exports.addBio = async (req, res) => {
     const user = await User.findOneAndUpdate({ _id: userId }, { Bio: bio });
     if (!user) {
       return res.status(500).json({
-        message: "An Error occoured while adding user!",
+        message: "An Error occoured while adding bio!",
       });
     }
     return res.status(201).json({
@@ -302,10 +302,11 @@ exports.addPreferences = async (req, res) => {
       music,
       pets,
     } = req.body;
+    console.log(req.body);
     const user = await User.findOneAndUpdate({ _id: userId }, { Smoking: smoking, Music: music, Pets: pets });
     if (!user) {
       return res.status(500).json({
-        message: "An Error occoured while adding user!",
+        message: "An Error occoured while adding preferences!",
       });
     }
     
