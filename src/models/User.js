@@ -30,11 +30,6 @@ const UserSchema = new mongoose.Schema({
     unique: true,
   },
 
-  Driver: {
-    type: Boolean,
-    default: false,
-  },
-
   Cars: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -55,11 +50,21 @@ const UserSchema = new mongoose.Schema({
     default: false,
   },
 
-  LicenseImage: {
-    type: String,
-  },
+  // LicenseImage: {
+  //   type: String,
+  // },
   
   LicenseVerifiedStatus: {
+    type: String,
+    default: "False",
+  },
+
+  CNICVerifiedStatus: {
+    type: String,
+    default: "False",
+  },
+
+  EmailVerifiedStatus: {
     type: String,
     default: "False",
   },
@@ -71,6 +76,7 @@ const UserSchema = new mongoose.Schema({
   CnicBack: {
     type: String,
   },
+
 });
 
 const User = mongoose.model("User", UserSchema);

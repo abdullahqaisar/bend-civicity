@@ -80,7 +80,16 @@ exports.checkAccount = async (req, res) => {
     return res.status(201).json({
       message: "Login successful!",
       token: token,
-      user: user,
+      firstName: user.FirstName,
+      lastName: user.LastName,
+      email: user.Email,
+      phoneNumber: user.PhoneNumber,
+      bio: user.Bio,
+      rating: user.Rating,
+      liscenceVerifiedStatus: user.LiscenceVerifiedStatus,
+      cnicVerifiedStatus: user.CnicVerifiedStatus,
+      emailVerifiedStatus: user.EmailVerifiedStatus,
+    
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
