@@ -54,7 +54,8 @@ const UserSchema = new mongoose.Schema({
 
 
   ProfileImage: {
-  //   type: String,
+    type: String,
+    default: "",
   },
 
   // LicenseImage: {
