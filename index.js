@@ -20,7 +20,6 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-  
 
 
 app.use(express.json({limit: '25mb'}));

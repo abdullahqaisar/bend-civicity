@@ -42,12 +42,20 @@ const UserSchema = new mongoose.Schema({
     default: "",
   },
 
-  Preferences: [{ smoking: Number, pets: Number, music: Number }],
+  Preferences: [
+    {
+      smoking: Number,
+      pets: Number,
+      music: Number,
+    },
+  ],
 
-  Rating: {
-    type: Number,
-    default: 0,
-  },
+  RideRatings: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Rating",
+    },
+  ],
 
   ActiveRide: {
     type: Boolean,

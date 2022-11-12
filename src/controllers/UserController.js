@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const Car = require("../models/Car");
 const Ride = require("../models/Ride");
-
+const Ratings = require("../models/Rating");
 const storeImage = require("../helpers/storeImageToServer").storeImage;
 
 exports.getUser = async (req, res) => {
@@ -67,40 +67,6 @@ exports.payByVisaCard = async (req, res) => {
       currency: "usd",
       payment_method_types: ["card"],
       card: card,
-    });
-    if (!payment) {
-      return res.status(401).json({ message: "Error making payment" });
-    }
-    ride.PaymentStatus = "Paid";
-    await ride.save();
-    return res.status(201).json({ message: "Payment Successful" });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-};
-
-exports.payByEasyPaisa = async (req, res) => {
-  try {
-    const userId = req.body.userId;
-    const user = await User.findById({ _id: userId });
-    if (!user) {
-      return res.status(401).json({ message: "Error finding user account" });
-    }
-    const rideId = req.body.rideId;
-    const ride = await Ride.findById({ _id: rideId });
-    if (!ride) {
-      return res.status(401).json({ message: "Error finding ride" });
-    }
-    const amount = req.body.amount;
-    const easyPaisaNumber = req.body.easyPaisaNumber;
-    const easyPaisa = {
-      easyPaisaNumber: easyPaisaNumber,
-    };
-    const payment = await stripe.paymentIntents.create({
-      amount: amount,
-      currency: "usd",
-      payment_method_types: ["card"],
-      easyPaisa: easyPaisa,
     });
     if (!payment) {
       return res.status(401).json({ message: "Error making payment" });
@@ -202,6 +168,46 @@ exports.addCar = async (req, res) => {
   }
 };
 
+exports.getAllAddedCar = async (req, res) => {
+  try {
+    const userId = req.user;
+    console.log(req.user);
+    const user = await User.findById({ _id: userId });
+    if (!user) {
+      return res.status(401).json({ message: "Error finding user account" });
+    }
+    const cars = await User.findById({ _id: userId }).populate("Cars");
+    return res.status(201).json({ cars: cars.Cars });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+//get average rating and all ratings
+exports.getRating = async (req, res) => {
+  try {
+    const userId = req.user;
+    const user = await User.findById({ _id: userId }).populate("RideRatings");
+    if (!user) {
+      return res.status(401).json({ message: "Error finding user account" });
+    }
+
+    const count = Object.keys(user.RideRatings).length;
+    let sum = 0;
+
+    console.log(count);
+    for (let i = 0; i < count; i++) {
+      sum += user.RideRatings[i].Score;
+    }
+    const averageRating = sum / count;
+    return res
+      .status(201)
+      .json({ averageRating: averageRating, ratings: user.RideRatings });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
 exports.getPublishedRides = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -270,6 +276,28 @@ exports.bookRide = async (req, res) => {
     return res.status(201).json({ message: "Ride Booked" });
   } catch (e) {
     return res.status(500).json({ error: e.message });
+  }
+};
+
+//Date, Time, Price, Rider, Rating, RideID, Status, Distance, EndingCity, StartingCity
+exports.getCompletedRides = async (req, res) => {
+  try {
+    const userId = req.user;
+    //find all rides that are completed and have the user as a passenger
+    const data = await Ride.find({
+      $and: [
+        { Status: "Completed" },
+        { Passengers: { $elemMatch: { _id: userId } } },
+      ],
+    });
+    if (!data) {
+      return res.status(201).json({
+        message: "No rides found!",
+      });
+    }
+    return res.status(201).send(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 };
 

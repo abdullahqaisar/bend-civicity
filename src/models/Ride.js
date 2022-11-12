@@ -1,18 +1,32 @@
 const mongoose = require("mongoose");
 
+//Date, Time, Price, Driver, Rating, RideID, Status, Distance, EndingCity, StartingCity
+
 const RideSchema = new mongoose.Schema({
   StartLat: {
     type: Number,
   },
+
   StartLong: {
     type: Number,
   },
+
   DropLat: {
     type: Number,
   },
+  
   DropLong: {
     type: Number,
   },
+
+  StartingCity: {
+    type: String,
+  },
+
+  EndingCity: {
+    type: String,
+  },
+
   StartLocation: {
     type: String,
     required: true,
@@ -70,9 +84,6 @@ const RideSchema = new mongoose.Schema({
     ref: "User",
   },
 
-  Rating: {
-    type: Number,
-  },
   MaxLuggage: {
     type: Number,
   },
@@ -90,6 +101,13 @@ const RideSchema = new mongoose.Schema({
       Seats: {
         type: Number,
       },
+    },
+  ],
+
+  Ratings: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Rating",
     },
   ],
 

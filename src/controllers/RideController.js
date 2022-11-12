@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Car = require("../models/Car");
 const Ride = require("../models/Ride");
 const Offer = require("../models/Offer");
+const Rating = require("../models/Rating");
 
 var calculateDistance =
   require("../helpers/calculateDistanceFromCoordinates").calculateDistance;
@@ -65,8 +66,13 @@ exports.publishRide = async (req, res) => {
         message: "Error adding a ride!",
       });
     }
+    console.log("RideId is "+ride._id);
 
-    car.Rides.push(ride._id);
+    car = await Car.findOneAndUpdate(
+      { _id: carId },
+      { $push: { Rides: ride._id } }
+    );
+
     car.IsCarInRide = true;
     car = await car.save();
 
@@ -107,7 +113,7 @@ exports.startRide = async (req, res) => {
 
 exports.priceOffers = async (req, res) => {
   try {
-    const { rideId, price, seats, } = req.body;
+    const { rideId, price, seats } = req.body;
     const userId = req.user;
     const ride = await Ride.findById({ _id: rideId });
     if (!ride) {
@@ -244,7 +250,6 @@ exports.rejectOffer = async (req, res) => {
     return res.status(500).json({ error: e.message });
   }
 };
-
 
 exports.dropPassengerOnRoute = async (req, res) => {
   const { rideId, userId } = req.body;
@@ -400,15 +405,55 @@ exports.cancelRide = async (req, res) => {
 };
 
 exports.addRating = async (req, res) => {
-  const { rideId, rating } = req.body;
-  const ride = await Ride.findByIdAndUpdate(
-    { _id: rideId },
-    { Rating: rating }
-  );
-  if (!ride) {
-    return res.status(500).json({ message: "Error adding the rating" });
+  try {
+    const userId = req.user;
+    const { rideId, score, comment } = req.body;
+    const ride = await Ride.findById({ _id: rideId });
+    if (!ride) {
+      return res.status(500).json({ message: "Error adding the rating" });
+    }
+
+    let rating = new Rating({
+      Score: score,
+      Comment: comment,
+      Date: Date.now(),
+      User: userId,
+    });
+
+    rating = await rating.save();
+
+    if (!rating) {
+      return res.status(500).json({ message: "Error adding the rating" });
+    }
+
+    const ride1 = await Ride.findByIdAndUpdate(
+      { _id: rideId },
+      { Ratings: rating._id }
+    );
+
+    if (!ride1) {
+      return res
+        .status(500)
+        .json({ message: "Error adding the rating to ride" });
+    }
+
+    const driver = await User.findByIdAndUpdate(
+      { _id: ride.Driver },
+      { $push: { RideRatings: rating._id } }
+    );
+
+
+    if (!driver) {
+      return res
+        .status(500)
+        .json({ message: "Error adding the rating to driver" });
+    }
+
+    return res.status(201).json({ message: "Rating added!" });
+  } catch (e) {
+    console.log(e.message);
+    return res.status(500).json({ error: e.message });
   }
-  return res.status(201).json({ message: "Rating Added!" });
 };
 
 exports.findRides = async (req, res) => {
