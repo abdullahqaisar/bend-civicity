@@ -1,8 +1,6 @@
 const UserCar = require("../models/Car");
 const Car = require("../models/Car");
 
-
-
 exports.addCar = async (req, res) => {
   try {
     const { carBrand, carModelName, carModelYear } = req.body;

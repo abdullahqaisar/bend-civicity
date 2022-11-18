@@ -2,7 +2,7 @@ const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 
 const CarSchema = new mongoose.Schema({
-  CarLiscensePlateNumber: {
+  CarLicensePlateNumber: {
     type: String,
   },
 

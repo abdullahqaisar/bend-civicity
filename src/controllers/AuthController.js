@@ -23,8 +23,8 @@ exports.signup = async (req, res) => {
       Email: email,
       PhoneNumber: phoneNumber,
     });
-    cnicBack = "data:image/png;base64,"+cnicBack;
-    cnicFront = "data:image/png;base64,"+cnicFront;
+    cnicBack = "data:image/png;base64," + cnicBack;
+    cnicFront = "data:image/png;base64," + cnicFront;
     // let directory = "uploads/images/" + phoneNumber + "/cnic/";
     // const backImgName = "CnicBack.png";
     // const frontImgName = "CnicFront.png";
@@ -63,7 +63,9 @@ exports.checkAccount = async (req, res) => {
     const { phoneNumber } = req.body;
     const user = await User.findOne({ PhoneNumber: phoneNumber });
     if (!user) {
-      return res.status(401).json({ message: "Account does not exist! Please proceed to signup" });
+      return res
+        .status(401)
+        .json({ message: "Account does not exist! Please proceed to signup" });
     }
     const token = await jwt.sign(
       {
@@ -89,7 +91,7 @@ exports.checkAccount = async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-}
+};
 
 // exports.getOtp = async (req, res) => {
 //   try {

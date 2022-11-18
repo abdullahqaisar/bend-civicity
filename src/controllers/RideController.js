@@ -66,7 +66,7 @@ exports.publishRide = async (req, res) => {
         message: "Error adding a ride!",
       });
     }
-    console.log("RideId is "+ride._id);
+    console.log("RideId is " + ride._id);
 
     car = await Car.findOneAndUpdate(
       { _id: carId },
@@ -316,23 +316,40 @@ exports.findPassengerCompletedRides = async (req, res) => {
   return res.status(201).json({ rides: rides });
 };
 
-exports.findRidesByDistance = async (req, res) => {
+exports.searchRides = async (req, res) => {
   try {
-    const { lat, long } = req.body;
+    const { startLat, startLong, dropLat, dropLong } = req.body;
     const rides = await Ride.find({
       Completed: false,
       AvailableSeats: { $gt: 0 },
-      StartTime: { $gte: req.body.startTime },
-    });
+      // StartTime: { $gte: req.body.startTime },
+    }).populate("Driver");
 
     if (!rides) {
       return res.status(500).json({ message: "Error finding rides" });
     }
     var filteredRides = rides.filter((ride) => {
-      //Find if ride is within 10km range
-      const findDistance = calculateDistance(lat, long, ride.Lat, ride.Long);
-      console.log(findDistance);
-      if (findDistance <= 10) {
+      // check if ride starting location is within 10km range
+      const distance = calculateDistance(
+        startLat,
+        startLong,
+        ride.Lat,
+        ride.Long
+      );
+      if (distance <= 10) {
+        return ride;
+      }
+    });
+
+    filteredRides = rides.filter((ride) => {
+      // check if ride ending location is within 10km range
+      const distance = calculateDistance(
+        dropLat,
+        dropLong,
+        ride.Lat,
+        ride.Long
+      );
+      if (distance <= 10) {
         return ride;
       }
     });
@@ -442,7 +459,6 @@ exports.addRating = async (req, res) => {
       { $push: { RideRatings: rating._id } }
     );
 
-
     if (!driver) {
       return res
         .status(500)
@@ -452,30 +468,6 @@ exports.addRating = async (req, res) => {
     return res.status(201).json({ message: "Rating added!" });
   } catch (e) {
     console.log(e.message);
-    return res.status(500).json({ error: e.message });
-  }
-};
-
-exports.findRides = async (req, res) => {
-  try {
-    const { lat2, lon2, startTime } = req.body;
-    const findRides = await Ride.find({
-      $or: [{ Completed: false }, { StartTime: { $gte: req.body.startTime } }],
-    });
-    if (!findRides) {
-      return res.status(500).json({
-        message: "Rides not found!",
-      });
-    }
-
-    var filteredRides = findRides.filter((ride) => {
-      const distance = getDistanceFromLatLon(ride.Lat, ride.Long, lat2, lon2);
-      if (distance < 10) {
-        return ride;
-      }
-    });
-    return res.status(201).send(filteredRides);
-  } catch (e) {
     return res.status(500).json({ error: e.message });
   }
 };

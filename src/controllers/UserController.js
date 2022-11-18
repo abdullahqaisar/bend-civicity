@@ -170,7 +170,8 @@ exports.addCar = async (req, res) => {
 
 exports.getAllAddedCar = async (req, res) => {
   try {
-    const userId = req.user;
+    // const userId = req.user;
+    const userId = "636f663e53855a49a79eae0c";
     console.log(req.user);
     const user = await User.findById({ _id: userId });
     if (!user) {

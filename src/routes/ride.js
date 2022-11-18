@@ -6,7 +6,7 @@ const RideController = require("../controllers/RideController");
 
 const auth = require("../middleware/auth");
 
-router.post("/findrides", RideController.findRidesByDistance);
+router.post("/searchrides", RideController.searchRides);
 router.post("/publishride", auth, RideController.publishRide);
 router.patch("/completeride", auth, RideController.completeRide);
 router.post("/addrating", auth, RideController.addRating)
