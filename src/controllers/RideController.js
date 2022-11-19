@@ -323,7 +323,7 @@ exports.searchRides = async (req, res) => {
       Completed: false,
       AvailableSeats: { $gt: 0 },
       // StartTime: { $gte: req.body.startTime },
-    }).populate("Driver");
+    }).populate("Driver", "_id FirstName LastName ");
 
     if (!rides) {
       return res.status(500).json({ message: "Error finding rides" });
@@ -354,6 +354,20 @@ exports.searchRides = async (req, res) => {
       }
     });
     return res.status(200).json({ rides: filteredRides });
+  } catch (e) {
+    console.log(e.message);
+    return res.status(500).json({ error: e.message });
+  }
+};
+
+exports.getDriverDetails = async (req, res) => {
+  try {
+    const driverId = req.params.driverid;
+    const driver = await User.findById({ _id: driverId });
+    if (!driver) {
+      return res.status(500).json({ message: "Error finding the driver" });
+    }
+    return res.status(201).json({ age: driver.Age,   });
   } catch (e) {
     console.log(e.message);
     return res.status(500).json({ error: e.message });

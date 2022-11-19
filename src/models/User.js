@@ -26,64 +26,73 @@ const UserSchema = new mongoose.Schema({
 
   PhoneNumber: {
     type: String,
-    // required: true,
+    required: true,
     unique: true,
   },
 
-  Cars: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Car",
-    },
-  ],
+  Age: {
+    type: Number,
+  },
 
   Bio: {
     type: String,
     default: "",
   },
 
-  Preferences: [
-    {
-      smoking: Number,
-      pets: Number,
-      music: Number,
+  Preferences: {
+    smoking: {
+      type: Number,
     },
-  ],
-
-  RideRatings: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Rating",
+    music: {
+      type: Number,
     },
-  ],
+    pets: {
+      type: Number,
+    },
+  },
 
   ActiveRide: {
     type: Boolean,
     default: false,
   },
 
+  ActiveRideId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Ride",
+  },
+
+  Ratings: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Rating",
+    },
+  ],
+
   ProfileImage: {
     type: String,
     default: "",
   },
 
-  // LicenseImage: {
-  //   type: String,
-  // },
-
-  LicenseVerifiedStatus: {
-    type: String,
-    default: "False",
+  //false for user, true for driver
+  UserType: {
+    type: boolean,
+    default: false,
   },
 
-  CNICVerifiedStatus: {
-    type: String,
-    default: "False",
-  },
-
-  EmailVerifiedStatus: {
-    type: String,
-    default: "False",
+  //0 for not provided, 1 for pending, 2 for verified
+  VerificationStatus: {
+    CNIC: {
+      type: String,
+      default: "False",
+    },
+    PhoneNumber: {
+      type: String,
+      default: "False",
+    },
+    Email: {
+      type: String,
+      default: "False",
+    },
   },
 
   CnicFront: {
@@ -92,6 +101,21 @@ const UserSchema = new mongoose.Schema({
 
   CnicBack: {
     type: String,
+  },
+
+  Rides: {
+    AsPassenger: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Ride",
+      },
+    ],
+    AsDriver: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Ride",
+      },
+    ],
   },
 });
 

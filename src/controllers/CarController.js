@@ -1,5 +1,4 @@
-const UserCar = require("../models/Car");
-const Car = require("../models/Car");
+const Car = require("../models/StoredCar");
 
 exports.addCar = async (req, res) => {
   try {

@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Driver = require("../models/Driver");
 const Car = require("../models/Car");
 const Ride = require("../models/Ride");
 const Ratings = require("../models/Rating");
@@ -7,9 +8,18 @@ const storeImage = require("../helpers/storeImageToServer").storeImage;
 exports.getUser = async (req, res) => {
   try {
     const userId = req.body.userId;
-    const user = await User.findById({ _id: userId });
+    let user = await User.findById({ _id: userId });
     if (!user) {
       return res.status(401).json({ message: "Error finding user account" });
+    }
+    if (user.UserType === "Driver") {
+      const driver = await Driver.findById({ UserId: userId });
+      if (!driver) {
+        return res
+          .status(401)
+          .json({ message: "Error finding driver account" });
+      }
+      user.Driver = driver;
     }
     return res.status(201).send(user);
   } catch (e) {
@@ -19,8 +29,8 @@ exports.getUser = async (req, res) => {
 
 exports.uploadProfilePicture = async (req, res) => {
   try {
-    // const userId = req.user;
-    const userId = "630fc860feb366a99f31e0a4";
+    const userId = req.user;
+    // const userId = "630fc860feb366a99f31e0a4";
     const buffer = req.body.image;
     const user = await User.findById({ _id: userId });
     if (!user) {
@@ -34,46 +44,6 @@ exports.uploadProfilePicture = async (req, res) => {
     user.ProfilePicture = imagePath;
     await user.save();
     return res.status(201).json({ message: "Profile Picture Uploaded" });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-};
-
-exports.payByVisaCard = async (req, res) => {
-  try {
-    const userId = req.body.userId;
-    const user = await User.findById({ _id: userId });
-    if (!user) {
-      return res.status(401).json({ message: "Error finding user account" });
-    }
-    const rideId = req.body.rideId;
-    const ride = await Ride.findById({ _id: rideId });
-    if (!ride) {
-      return res.status(401).json({ message: "Error finding ride" });
-    }
-    const amount = req.body.amount;
-    const cardNumber = req.body.cardNumber;
-    const cardHolderName = req.body.cardHolderName;
-    const expiryDate = req.body.expiryDate;
-    const cvv = req.body.cvv;
-    const card = {
-      cardNumber: cardNumber,
-      cardHolderName: cardHolderName,
-      expiryDate: expiryDate,
-      cvv: cvv,
-    };
-    const payment = await stripe.paymentIntents.create({
-      amount: amount,
-      currency: "usd",
-      payment_method_types: ["card"],
-      card: card,
-    });
-    if (!payment) {
-      return res.status(401).json({ message: "Error making payment" });
-    }
-    ride.PaymentStatus = "Paid";
-    await ride.save();
-    return res.status(201).json({ message: "Payment Successful" });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -149,16 +119,36 @@ exports.addCar = async (req, res) => {
       });
     }
     const carId = car._id;
-    user = await User.findOneAndUpdate(
-      { _id: userId },
-      { $push: { Cars: carId } }
-    );
-    if (!user) {
-      return res.status(500).json({
-        message: "Error pushing car to user!",
+    if (user.UserType !== "Driver") {
+      let driver = new Driver({
+        UserId: userId,
+        Cars: [carId],
       });
+      user.UserType = "Driver";
+      user = await user.save();
+      if (!user) {
+        return res.status(500).json({
+          message: "Error adding car!",
+        });
+      }
+
+      driver = await driver.save();
+      if (!driver) {
+        return res.status(500).json({
+          message: "Error adding car!",
+        });
+      }
+    } else {
+      let driver = await Driver.findOneAndUpdate(
+        { _id: userId },
+        { $push: { Cars: carId } }
+      );
+      if (!driver) {
+        return res.status(500).json({
+          message: "Error adding car to driver!",
+        });
+      }
     }
-    console.log(carId);
     return res.status(201).json({
       message: "Car Added!",
       carId: carId,
@@ -170,15 +160,13 @@ exports.addCar = async (req, res) => {
 
 exports.getAllAddedCar = async (req, res) => {
   try {
-    // const userId = req.user;
-    const userId = "636f663e53855a49a79eae0c";
+    const id = req.user;
     console.log(req.user);
-    const user = await User.findById({ _id: userId });
-    if (!user) {
-      return res.status(401).json({ message: "Error finding user account" });
+    const driver = await Driver.findOne({ UserId: id }).populate("Cars");
+    if (!driver) {
+      return res.status(500).json({ message: "Error finding Driver" });
     }
-    const cars = await User.findById({ _id: userId }).populate("Cars");
-    return res.status(201).json({ cars: cars.Cars });
+    return res.status(201).json({ cars: driver.Cars });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -188,7 +176,7 @@ exports.getAllAddedCar = async (req, res) => {
 exports.getRating = async (req, res) => {
   try {
     const userId = req.user;
-    const user = await User.findById({ _id: userId }).populate("RideRatings");
+    const user = await User.findById({ _id: userId }).populate("Ratings");
     if (!user) {
       return res.status(401).json({ message: "Error finding user account" });
     }
@@ -205,7 +193,7 @@ exports.getRating = async (req, res) => {
       .status(201)
       .json({ averageRating: averageRating, ratings: user.RideRatings });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    return res.status(500).json({ error: e.message });
   }
 };
 
@@ -220,7 +208,7 @@ exports.getPublishedRides = async (req, res) => {
     }
     return res.status(201).send(data);
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    return res.status(500).json({ error: e.message });
   }
 };
 
@@ -230,13 +218,13 @@ exports.bookRide = async (req, res) => {
     const userId = req.user;
     const user = await User.findById({ _id: userId });
     if (user.ActiveRide) {
-      return res.status(500).json({
+      return res.status(401).json({
         message: "You already have an active ride!",
       });
     }
     const ride = await Ride.findById({ _id: rideId });
     if (!ride) {
-      return res.status(500).json({
+      return res.status(401).json({
         message: "Ride not found!",
       });
     }
@@ -265,7 +253,8 @@ exports.bookRide = async (req, res) => {
 
     const updateUser = await User.findByIdAndUpdate(
       { _id: req.body.userId },
-      { ActiveRide: true }
+      { ActiveRide: true },
+      { ActiveRideId: rideId }
     );
 
     if (!updateUser) {
@@ -330,7 +319,13 @@ exports.addPreferences = async (req, res) => {
     console.log(req.body);
     const user = await User.findOneAndUpdate(
       { _id: userId },
-      { $push: { Preferences: { Smoking: smoking, Music: music, Pets: pets } } }
+      {
+        Preferences: {
+          Smoking: smoking,
+          Music: music,
+          Pets: pets,
+        },
+      }
     );
     if (!user) {
       return res.status(500).json({
@@ -357,13 +352,13 @@ exports.deleteCar = async (req, res) => {
       return res.status(404).json({ message: "Car not found!" });
     }
 
-    const user = await User.findByIdAndUpdate(
-      { _id: userId },
+    const user = await Driver.findOneAndUpdate(
+      { UserId: userId },
       { $pull: { Cars: carId } }
     );
     console.log(user);
     if (!user) {
-      return res.status(401).json({ message: "Can't delete car!" });
+      return res.status(500).json({ message: "Can't delete car!" });
     }
     return res.status(200).json({ message: "Car deleted!" });
   } catch (err) {
