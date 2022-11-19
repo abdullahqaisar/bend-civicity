@@ -1,4 +1,3 @@
-const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 
 const CarModel = new mongoose.Schema({
@@ -13,5 +12,5 @@ const CarModel = new mongoose.Schema({
   },
 });
 
-const AllCar = mongoose.model("Car", CarModel);
+const AllCar = mongoose.model("StoredCar", CarModel);
 module.exports = AllCar;

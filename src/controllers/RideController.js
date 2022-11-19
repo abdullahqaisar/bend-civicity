@@ -35,6 +35,10 @@ exports.publishRide = async (req, res) => {
     if (!car) {
       return res.status(400).json({ msg: "Car not found" });
     }
+
+    if (car.IsCarInRide){
+      return res.status(400).json({ msg: "Car is already in a ride" });
+    }
     const totalDistance = calculateDistance(
       startLat,
       startLong,
@@ -102,8 +106,12 @@ exports.startRide = async (req, res) => {
 
   const user = await User.findByIdAndUpdate(
     { _id: userId },
-    { ActiveRide: true }
+    { ActiveRide: true },
+    { ActiveRideId: rideId }
   );
+
+  // Add the ride to the all user's active rides Here
+
   if (!user) {
     return res.status(500).json({ message: "Can't find the user!" });
   }

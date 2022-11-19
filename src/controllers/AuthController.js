@@ -2,11 +2,10 @@ const moongose = require("mongoose");
 
 const jwt = require("jsonwebtoken");
 
-const otpGenerator = require("otp-generator"); //Generate OTP
-const twilio = require("twilio")(process.env.SID, process.env.AUTH_TOKEN);
+// const otpGenerator = require("otp-generator"); //Generate OTP
+// const twilio = require("twilio")(process.env.SID, process.env.AUTH_TOKEN);
 
 const User = require("../models/User");
-const Otp = require("../models/Otp");
 
 require("dotenv").config();
 

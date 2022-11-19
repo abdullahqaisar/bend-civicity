@@ -75,7 +75,7 @@ const UserSchema = new mongoose.Schema({
 
   //false for user, true for driver
   UserType: {
-    type: boolean,
+    type: Boolean,
     default: false,
   },
 
