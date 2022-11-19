@@ -36,7 +36,7 @@ exports.publishRide = async (req, res) => {
       return res.status(400).json({ msg: "Car not found" });
     }
 
-    if (car.IsCarInRide){
+    if (car.IsCarInRide) {
       return res.status(400).json({ msg: "Car is already in a ride" });
     }
     const totalDistance = calculateDistance(
@@ -371,11 +371,20 @@ exports.searchRides = async (req, res) => {
 exports.getDriverDetails = async (req, res) => {
   try {
     const driverId = req.params.driverid;
-    const driver = await User.findById({ _id: driverId });
+    const driver = await User.findById({ _id: driverId }).populate([
+      { path: "DriverId" },
+      { path: "Ratings", populate: { path: "User", select: 'firstname'} },
+    ]);
+
     if (!driver) {
       return res.status(500).json({ message: "Error finding the driver" });
     }
-    return res.status(201).json({ age: driver.Age,   });
+    return res.status(201).json({
+      age: driver.Age,
+      experienceLevel: driver.DriverId.ExperienceLevel,
+      ratings: driver.Ratings,
+    });
+
   } catch (e) {
     console.log(e.message);
     return res.status(500).json({ error: e.message });
@@ -478,7 +487,7 @@ exports.addRating = async (req, res) => {
 
     const driver = await User.findByIdAndUpdate(
       { _id: ride.Driver },
-      { $push: { RideRatings: rating._id } }
+      { $push: { Ratings: rating._id } }
     );
 
     if (!driver) {

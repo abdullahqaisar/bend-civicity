@@ -3,6 +3,7 @@ const Driver = require("../models/Driver");
 const Car = require("../models/Car");
 const Ride = require("../models/Ride");
 const Ratings = require("../models/Rating");
+
 const storeImage = require("../helpers/storeImageToServer").storeImage;
 
 exports.getUser = async (req, res) => {
@@ -119,12 +120,13 @@ exports.addCar = async (req, res) => {
       });
     }
     const carId = car._id;
-    if (user.UserType !== "Driver") {
+    if (user.UserType !== true) {
       let driver = new Driver({
         UserId: userId,
         Cars: [carId],
       });
-      user.UserType = "Driver";
+      user.UserType = true;
+      user.DriverId = driver._id;
       user = await user.save();
       if (!user) {
         return res.status(500).json({
@@ -140,7 +142,7 @@ exports.addCar = async (req, res) => {
       }
     } else {
       let driver = await Driver.findOneAndUpdate(
-        { _id: userId },
+        { UserId: userId },
         { $push: { Cars: carId } }
       );
       if (!driver) {

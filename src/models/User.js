@@ -79,6 +79,11 @@ const UserSchema = new mongoose.Schema({
     default: false,
   },
 
+  DriverId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Driver",
+  },
+
   //0 for not provided, 1 for pending, 2 for verified
   VerificationStatus: {
     CNIC: {
