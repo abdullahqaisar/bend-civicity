@@ -13,9 +13,12 @@ const ratingSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+
+  // 0: Passenger, 1: Driver
   UserRole: {
-    type: String,
+    type: Number,
   },
+  
   User: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

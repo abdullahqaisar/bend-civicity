@@ -1,8 +1,6 @@
-const User = require("../models/User");
-const Driver = require("../models/Driver");
-const Car = require("../models/Car");
-const Ride = require("../models/Ride");
-const Ratings = require("../models/Rating");
+const User = require("../models/user.model");
+const Ride = require("../models/ride.model");
+const Rating = require("../models/rating.model");
 
 const storeImage = require("../helpers/storeImageToServer").storeImage;
 
@@ -12,15 +10,6 @@ exports.getUser = async (req, res) => {
     let user = await User.findById({ _id: userId });
     if (!user) {
       return res.status(401).json({ message: "Error finding user account" });
-    }
-    if (user.UserType === "Driver") {
-      const driver = await Driver.findById({ UserId: userId });
-      if (!driver) {
-        return res
-          .status(401)
-          .json({ message: "Error finding driver account" });
-      }
-      user.Driver = driver;
     }
     return res.status(201).send(user);
   } catch (e) {
@@ -82,25 +71,6 @@ exports.addCar = async (req, res) => {
     //   return res.status(401).json({ message: "License not verified" });
     // }
 
-    const {
-      licensePlateNumber,
-      brand,
-      modelName,
-      modelYear,
-      colour,
-      fuelAverage,
-    } = req.body;
-
-    let car = new Car({
-      CarLiscensePlateNumber: licensePlateNumber,
-      CarBrand: brand,
-      CarModelName: modelName,
-      CarModelYear: modelYear,
-      CarColour: colour,
-      UserId: userId,
-      FuelAverage: fuelAverage,
-    });
-
     // let directory = "uploads/images/" + phoneNumber + "/car/";
     // const carImageName = car._id + "Car.png";
 
@@ -113,44 +83,28 @@ exports.addCar = async (req, res) => {
     //   newUser.CnicFront = carImgPath;
     // }
 
-    car = await car.save();
-    if (!car) {
+    const { licensePlateNumber, brand, modelName, modelYear, colour } =
+      req.body;
+
+    user.DriverData.Cars.push({
+      LicensePlateNumber: licensePlateNumber,
+      Brand: brand,
+      ModelName: modelName,
+      ModelYear: modelYear,
+      Colour: colour,
+    });
+
+    if (user.UserType !== true) {
+      user.UserType = true;
+    }
+
+    user = await user.save();
+    if (!user) {
       return res.status(500).json({
         message: "Error adding car!",
       });
     }
-    const carId = car._id;
-    if (user.UserType !== true) {
-      let driver = new Driver({
-        UserId: userId,
-        Cars: [carId],
-      });
-      user.UserType = true;
-      user.DriverId = driver._id;
-      user = await user.save();
-      if (!user) {
-        return res.status(500).json({
-          message: "Error adding car!",
-        });
-      }
 
-      driver = await driver.save();
-      if (!driver) {
-        return res.status(500).json({
-          message: "Error adding car!",
-        });
-      }
-    } else {
-      let driver = await Driver.findOneAndUpdate(
-        { UserId: userId },
-        { $push: { Cars: carId } }
-      );
-      if (!driver) {
-        return res.status(500).json({
-          message: "Error adding car to driver!",
-        });
-      }
-    }
     return res.status(201).json({
       message: "Car Added!",
       carId: carId,
@@ -162,38 +116,43 @@ exports.addCar = async (req, res) => {
 
 exports.getAllAddedCar = async (req, res) => {
   try {
-    const id = req.user;
-    console.log(req.user);
-    const driver = await Driver.findOne({ UserId: id }).populate("Cars");
-    if (!driver) {
+    const userId = req.user;
+
+    //only select cars from user
+    const cars = User.findById({ _id: userId }).select("DriverData.Cars");
+    if (!cars) {
       return res.status(500).json({ message: "Error finding Driver" });
     }
-    return res.status(201).json({ cars: driver.Cars });
+    return res.status(201).json({ cars: cars });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 };
 
 //get average rating and all ratings
-exports.getRating = async (req, res) => {
+exports.getDriverRating = async (req, res) => {
   try {
     const userId = req.user;
-    const user = await User.findById({ _id: userId }).populate("Ratings");
+
+    const user = await User.findById({ _id: userId }).populate({
+      path: "Ratings",
+      match: { UserRole: 1 },
+    });
     if (!user) {
       return res.status(401).json({ message: "Error finding user account" });
     }
 
-    const count = Object.keys(user.RideRatings).length;
+    const count = Object.keys(user.Ratings).length;
     let sum = 0;
 
     console.log(count);
     for (let i = 0; i < count; i++) {
-      sum += user.RideRatings[i].Score;
+      sum += user.Ratings[i].Score;
     }
     const averageRating = sum / count;
     return res
       .status(201)
-      .json({ averageRating: averageRating, ratings: user.RideRatings });
+      .json({ averageRating: averageRating, ratings: user.Ratings });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
@@ -214,76 +173,73 @@ exports.getPublishedRides = async (req, res) => {
   }
 };
 
-exports.bookRide = async (req, res) => {
-  try {
-    const { rideId, seats } = req.body;
-    const userId = req.user;
-    const user = await User.findById({ _id: userId });
-    if (user.ActiveRide) {
-      return res.status(401).json({
-        message: "You already have an active ride!",
-      });
-    }
-    const ride = await Ride.findById({ _id: rideId });
-    if (!ride) {
-      return res.status(401).json({
-        message: "Ride not found!",
-      });
-    }
-    if (ride.AvailableSeats <= seats) {
-      return res.status(500).json({
-        message: "Sorry, only " + ride.AvailableSeats + " seats are available!",
-      });
-    }
-    const updateRide = await Ride.findByIdAndUpdate(
-      { _id: rideId },
-      {
-        $push: {
-          Passengers: {
-            _id: req.body.userId,
-            Seats: seats,
-          },
-        },
-      }
-    );
+// exports.bookRide = async (req, res) => {
+//   try {
+//     const { rideId, seats } = req.body;
+//     const userId = req.user;
+//     const user = await User.findById({ _id: userId });
+//     if (user.ActiveRide) {
+//       return res.status(401).json({
+//         message: "You already have an active ride!",
+//       });
+//     }
+//     const ride = await Ride.findById({ _id: rideId });
+//     if (!ride) {
+//       return res.status(401).json({
+//         message: "Ride not found!",
+//       });
+//     }
+//     if (ride.AvailableSeats <= seats) {
+//       return res.status(500).json({
+//         message: "Sorry, only " + ride.AvailableSeats + " seats are available!",
+//       });
+//     }
+//     const updateRide = await Ride.findByIdAndUpdate(
+//       { _id: rideId },
+//       {
+//         $push: {
+//           Passengers: {
+//             _id: req.body.userId,
+//             Seats: seats,
+//           },
+//         },
+//       }
+//     );
 
-    if (!updateRide) {
-      return res.status(500).json({
-        message: "Error booking the ride!",
-      });
-    }
+//     if (!updateRide) {
+//       return res.status(500).json({
+//         message: "Error booking the ride!",
+//       });
+//     }
 
-    const updateUser = await User.findByIdAndUpdate(
-      { _id: req.body.userId },
-      { ActiveRide: true },
-      { ActiveRideId: rideId }
-    );
+//     const updateUser = await User.findByIdAndUpdate(
+//       { _id: req.body.userId },
+//       { ActiveRide: true },
+//       { ActiveRideId: rideId }
+//     );
 
-    if (!updateUser) {
-      return res.status(500).json({
-        message: "Error booking the ride!",
-      });
-    }
+//     if (!updateUser) {
+//       return res.status(500).json({
+//         message: "Error booking the ride!",
+//       });
+//     }
 
-    return res.status(201).json({ message: "Ride Booked" });
-  } catch (e) {
-    return res.status(500).json({ error: e.message });
-  }
-};
+//     return res.status(201).json({ message: "Ride Booked" });
+//   } catch (e) {
+//     return res.status(500).json({ error: e.message });
+//   }
+// };
 
-//Date, Time, Price, Rider, Rating, RideID, Status, Distance, EndingCity, StartingCity
+//find all rides that are completed and have the user as a passenger
 exports.getCompletedRides = async (req, res) => {
   try {
     const userId = req.user;
-    //find all rides that are completed and have the user as a passenger
+
     const data = await Ride.find({
-      $and: [
-        { Status: "Completed" },
-        { Passengers: { $elemMatch: { _id: userId } } },
-      ],
+      $and: [{ Status: 2 }, { Passengers: { $elemMatch: { _id: userId } } }],
     });
     if (!data) {
-      return res.status(201).json({
+      return res.status(400).json({
         message: "No rides found!",
       });
     }
@@ -295,13 +251,11 @@ exports.getCompletedRides = async (req, res) => {
 
 exports.addBio = async (req, res) => {
   try {
-    console.log(req.body);
-    console.log(req.user);
     const bio = req.body.bio;
     const userId = req.user;
     const user = await User.findOneAndUpdate({ _id: userId }, { Bio: bio });
     if (!user) {
-      return res.status(500).json({
+      return res.status(400).json({
         message: "An Error occoured while adding bio!",
       });
     }
@@ -323,9 +277,9 @@ exports.addPreferences = async (req, res) => {
       { _id: userId },
       {
         Preferences: {
-          Smoking: smoking,
-          Music: music,
-          Pets: pets,
+          smoking: smoking,
+          music: music,
+          pets: pets,
         },
       }
     );
@@ -349,19 +303,25 @@ exports.deleteCar = async (req, res) => {
     const carId = String(req.params.carid);
 
     const userId = req.user;
-    const car = await Car.find({ _id: carId });
+    const car = await Car.findById({ _id: carId });
     if (!car) {
       return res.status(404).json({ message: "Car not found!" });
     }
 
-    const user = await Driver.findOneAndUpdate(
+    const user = await User.findOneAndUpdate(
       { UserId: userId },
       { $pull: { Cars: carId } }
     );
-    console.log(user);
+
     if (!user) {
       return res.status(500).json({ message: "Can't delete car!" });
     }
+
+    const deletedCar = await Car.findByIdAndDelete({ _id: car });
+    if (!deletedCar) {
+      return res.status(500).json({ message: "Can't delete car!" });
+    }
+
     return res.status(200).json({ message: "Car deleted!" });
   } catch (err) {
     res.status(500).json({ error: err.message });

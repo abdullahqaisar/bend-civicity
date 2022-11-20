@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 // const otpGenerator = require("otp-generator"); //Generate OTP
 // const twilio = require("twilio")(process.env.SID, process.env.AUTH_TOKEN);
 
-const User = require("../models/User");
+const User = require("../models/user.model");
 
 require("dotenv").config();
 

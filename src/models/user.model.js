@@ -68,9 +68,20 @@ const UserSchema = new mongoose.Schema({
     },
   ],
 
-  ProfileImage: {
-    type: String,
-    default: "",
+  Images: {
+    Profile: {
+      type: String,
+    },
+    CnicFront: {
+      type: String,
+    },
+
+    CnicBack: {
+      type: String,
+    },
+    License: {
+      type: String,
+    },
   },
 
   //false for user, true for driver
@@ -79,46 +90,104 @@ const UserSchema = new mongoose.Schema({
     default: false,
   },
 
-  DriverId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Driver",
-  },
-
   //0 for not provided, 1 for pending, 2 for verified
   VerificationStatus: {
     CNIC: {
-      type: String,
-      default: "False",
+      type: Number,
+      default: 0,
     },
     PhoneNumber: {
-      type: String,
-      default: "False",
+      type: Number,
+      default: 2,
     },
     Email: {
-      type: String,
-      default: "False",
+      type: Number,
+      default: 0,
+    },
+    License: {
+      type: Number,
+      default: 0,
     },
   },
 
-  CnicFront: {
-    type: String,
+  RidesTaken: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Ride",
+    },
+  ],
+
+  MemberSince: {
+    type: Date,
+    default: Date.now,
   },
 
-  CnicBack: {
-    type: String,
-  },
+  DriverData: {
+    ExperienceLevel: {
+      type: String,
+    },
 
-  Rides: {
-    AsPassenger: [
+    Rides: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Ride",
       },
     ],
-    AsDriver: [
+
+    Cars: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Ride",
+        id: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+
+        LicensePlateNumber: {
+          type: String,
+        },
+
+        Brand: {
+          type: String,
+        },
+
+        ModelYear: {
+          type: Number,
+        },
+
+        Colour: {
+          type: String,
+        },
+
+        ModelName: {
+          type: String,
+        },
+
+        IsCarInRide: {
+          type: Boolean,
+          default: false,
+        },
+
+        Rides: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Ride",
+        },
+
+        Images: {
+          CarImage: {
+            type: String,
+            data: Buffer,
+            contentType: String,
+          },
+          CopyFrontImage: {
+            path: String,
+            data: Buffer,
+            contentType: String,
+          },
+
+          CopyBackImage: {
+            path: String,
+            data: Buffer,
+            contentType: String,
+          },
+        },
       },
     ],
   },

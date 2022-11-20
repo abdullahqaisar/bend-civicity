@@ -6,10 +6,10 @@ const bodyParser = require("body-parser");
 
 require("dotenv").config();
 
-const authRoutes = require("./src/routes/auth");
-const userRoutes = require("./src/routes/user");
-const rideRoutes = require("./src/routes/ride");
-const adminRoutes = require("./src/routes/admin");
+const authRoutes = require("./src/routes/auth.routes");
+const userRoutes = require("./src/routes/user.routes");
+const rideRoutes = require("./src/routes/ride.routes");
+const adminRoutes = require("./src/routes/admin.routes");
 
 mongoose
   .connect(process.env.DATABASE_CONNECTION)

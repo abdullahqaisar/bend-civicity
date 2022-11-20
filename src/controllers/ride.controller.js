@@ -1,11 +1,44 @@
-const User = require("../models/User");
-const Car = require("../models/Car");
-const Ride = require("../models/Ride");
-const Offer = require("../models/Offer");
-const Rating = require("../models/Rating");
+const User = require("../models/user.model");
+const Ride = require("../models/ride.model");
+const Rating = require("../models/rating.model");
 
 var calculateDistance =
   require("../helpers/calculateDistanceFromCoordinates").calculateDistance;
+
+// When user clicks on Offer Ride Button
+exports.offerRide = async (req, res) => {
+  try {
+    const userId = req.user;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(500).json({
+        message: "Error finding the user",
+      });
+    }
+    if (user.VerificationStatus.CNIC === 0) {
+      return res.status(401).json({
+        message: "You are not verified yet",
+      });
+    }
+    if (user.VerificationStatus.CNIC === 1) {
+      return res.status(400).json({
+        message: "Your CNIC is pending, please wait for it to be approved.",
+      });
+    }
+
+    if (user.VerificationStatus.CNIC === 2) {
+      return res.status(201).json({
+        message: "Please proceed adding a ride!",
+      });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
 
 exports.publishRide = async (req, res) => {
   try {
@@ -96,10 +129,7 @@ exports.publishRide = async (req, res) => {
 
 exports.startRide = async (req, res) => {
   const { rideId, userId } = req.body;
-  const ride = await Ride.findByIdAndUpdate(
-    { _id: rideId },
-    { RideStatus: true }
-  );
+  const ride = await Ride.findByIdAndUpdate({ _id: rideId }, { Status: 1 });
   if (!ride) {
     return res.status(500).json({ message: "Error starting the ride" });
   }
@@ -372,8 +402,12 @@ exports.getDriverDetails = async (req, res) => {
   try {
     const driverId = req.params.driverid;
     const driver = await User.findById({ _id: driverId }).populate([
-      { path: "DriverId" },
-      { path: "Ratings", populate: { path: "User", select: 'firstname'} },
+      { path: "DriverId", select: "ExperienceLevel" },
+      {
+        path: "Ratings",
+        select: "_id Score Comment",
+        populate: { path: "User", select: "FirstName LastName" },
+      },
     ]);
 
     if (!driver) {
@@ -382,9 +416,11 @@ exports.getDriverDetails = async (req, res) => {
     return res.status(201).json({
       age: driver.Age,
       experienceLevel: driver.DriverId.ExperienceLevel,
+      verificationStatus: driver.VerificationStatus,
+      bio: driver.Bio,
+      memberSince: driver.MemberSince,
       ratings: driver.Ratings,
     });
-
   } catch (e) {
     console.log(e.message);
     return res.status(500).json({ error: e.message });

@@ -3,9 +3,9 @@ const bcrypt = require("bcrypt");
 
 require("dotenv").config();
 
-const Admin = require("../models/Admin");
-const User = require("../models/User");
-const Ride = require("../models/Ride");
+const Admin = require("../models/admin.model");
+const User = require("../models/user.model");
+const Ride = require("../models/ride.model");
 
 const convertImage = require("../helpers/convertImageToBase64").convertImage;
 
