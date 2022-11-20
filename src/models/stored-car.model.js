@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
 const CarModel = new mongoose.Schema({
-  CarBrand: {
+  brand: {
     type: String,
   },
-  CarModelName: {
+  modelName: {
     type: String,
   },
-  CarModelYear: {
+  modelYear: {
     type: String,
   },
 });

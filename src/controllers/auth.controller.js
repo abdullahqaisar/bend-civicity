@@ -16,11 +16,11 @@ exports.signup = async (req, res) => {
     let { firstName, lastName, email, phoneNumber, age, cnicBack, cnicFront } =
       req.body;
     const newUser = new User({
-      FirstName: firstName,
-      LastName: lastName,
-      Email: email,
-      PhoneNumber: phoneNumber,
-      Age: age,
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      age,
     });
     cnicBack = "data:image/png;base64," + cnicBack;
     cnicFront = "data:image/png;base64," + cnicFront;
@@ -60,7 +60,7 @@ exports.signup = async (req, res) => {
 exports.checkAccount = async (req, res) => {
   try {
     const { phoneNumber } = req.body;
-    const user = await User.findOne({ PhoneNumber: phoneNumber });
+    const user = await User.findOne({ phoneNumber: phoneNumber }).populate("Ratings");
     if (!user) {
       return res
         .status(401)
@@ -73,19 +73,25 @@ exports.checkAccount = async (req, res) => {
       },
       process.env.JWT_KEY
     );
+
+
+    ///////User Login, ADD Driver Login too///////////////////////////
+
+
     return res.status(201).json({
       message: "Login successful!",
       token: token,
-      firstName: user.FirstName,
-      lastName: user.LastName,
-      email: user.Email,
-      bio: user.Bio,
-      rating: user.Rating,
-      licenseVerifiedStatus: user.LicenseVerifiedStatus,
-      cnicVerifiedStatus: user.CNICVerifiedStatus,
-      emailVerifiedStatus: user.EmailVerifiedStatus,
-      cars: user.Cars,
-      profileImage: user.ProfileImage,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      bio: user.bio,
+      rating: user.ratings,
+      verificationStatus: {
+        cnic: driver.VerificationStatus.cnic,
+        drivingLicense: driver.VerificationStatus.license,
+        email: driver.VerificationStatus.email,
+        phoneNumber: driver.VerificationStatus.phoneNumber,
+      },
     });
   } catch (e) {
     res.status(500).json({ error: e.message });

@@ -1,25 +1,25 @@
 const mongoose = require("mongoose");
 
 const ratingSchema = new mongoose.Schema({
-  Score: {
+  score: {
     type: Number,
     default: 0,
   },
-  Comment: {
+  comment: {
     type: String,
     default: "",
   },
-  Date: {
+  date: {
     type: Date,
     default: Date.now,
   },
 
   // 0: Passenger, 1: Driver
-  UserRole: {
+  userRole: {
     type: Number,
   },
-  
-  User: {
+
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },

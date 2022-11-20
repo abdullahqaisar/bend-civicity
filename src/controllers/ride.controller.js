@@ -42,8 +42,7 @@ exports.offerRide = async (req, res) => {
 
 exports.publishRide = async (req, res) => {
   try {
-    console.log(req.body);
-    console.log(req.user);
+
     const userId = req.user;
     const {
       startLat,
@@ -64,12 +63,14 @@ exports.publishRide = async (req, res) => {
       return res.status(400).json({ msg: "User not found" });
     }
 
-    let car = await Car.findById({ _id: carId });
+    //find the car by carId from user
+    const car = user.cars.findOne((car) => car._id == carId);
+    console.log(car);
     if (!car) {
       return res.status(400).json({ msg: "Car not found" });
     }
 
-    if (car.IsCarInRide) {
+    if (car.isCarInRide) {
       return res.status(400).json({ msg: "Car is already in a ride" });
     }
     const totalDistance = calculateDistance(
@@ -80,21 +81,23 @@ exports.publishRide = async (req, res) => {
     );
 
     let ride = new Ride({
-      StartLat: startLat,
-      StartLong: startLong,
-      DropLat: dropLat,
-      DropLong: dropLong,
-      TotalDistance: totalDistance,
-      StartLocation: startLocation,
-      DropLocation: dropLocation,
-      TotalSeats: totalSeats,
-      TotalDistance: totalDistance,
-      MaxLuggage: maxLuggage,
-      AvailableSeats: totalSeats,
-      PricePerSeat: pricePerSeat,
-      StartTime: date,
-      Driver: userId,
-      Car: carId,
+      start: {
+        latitide: startLat,
+        longitude: startLong,
+        location: startLocation,
+      },
+      drop: {
+        latitide: dropLat,
+        longitude: dropLong,
+        location: dropLocation,
+      },
+      totalDistance,
+      totalSeats,
+      maxLuggage,
+      pricePerSeat,
+      startTime: date,
+      driver: userId,
+      car: carId,
     });
 
     ride = await ride.save();
@@ -198,7 +201,8 @@ exports.priceOffers = async (req, res) => {
 
 exports.acceptOffer = async (req, res) => {
   try {
-    const { rideId, userId } = req.body;
+    const userId = req.user;
+    const rideId = req.body;
     const ride = await Ride.findById({ _id: rideId });
     if (!ride) {
       return res.status(500).json({
@@ -327,9 +331,8 @@ exports.findDriverCompletedRides = async (req, res) => {
   const { userId } = req.body;
 
   const rides = await Ride.find({
-    Driver: userId,
-    RideStatus: true,
-    Completed: true,
+    driver: userId,
+    status: 2,
   });
   if (!rides) {
     return res.status(500).json({ message: "Error finding the rides" });
@@ -342,9 +345,8 @@ exports.findPassengerCompletedRides = async (req, res) => {
   const { userId } = req.body;
 
   const rides = await Ride.find({
-    Passengers: userId,
-    RideStatus: true,
-    Completed: true,
+    passengers: { id: userId },
+    RideStatus: 2,
   });
 
   if (!rides) {
@@ -358,21 +360,21 @@ exports.searchRides = async (req, res) => {
   try {
     const { startLat, startLong, dropLat, dropLong } = req.body;
     const rides = await Ride.find({
-      Completed: false,
-      AvailableSeats: { $gt: 0 },
+      status: 0,
+      availableSeats: { $gt: 0 },
       // StartTime: { $gte: req.body.startTime },
-    }).populate("Driver", "_id FirstName LastName ");
+    }).populate("driver", "_id FirstName LastName ");
 
     if (!rides) {
       return res.status(500).json({ message: "Error finding rides" });
     }
-    var filteredRides = rides.filter((ride) => {
+    let filteredRides = rides.filter((ride) => {
       // check if ride starting location is within 10km range
       const distance = calculateDistance(
         startLat,
         startLong,
-        ride.Lat,
-        ride.Long
+        ride.start.latitide,
+        ride.start.longitude
       );
       if (distance <= 10) {
         return ride;
@@ -384,8 +386,8 @@ exports.searchRides = async (req, res) => {
       const distance = calculateDistance(
         dropLat,
         dropLong,
-        ride.Lat,
-        ride.Long
+        ride.drop.latitide,
+        ride.drop.longitude
       );
       if (distance <= 10) {
         return ride;
@@ -401,25 +403,26 @@ exports.searchRides = async (req, res) => {
 exports.getDriverDetails = async (req, res) => {
   try {
     const driverId = req.params.driverid;
-    const driver = await User.findById({ _id: driverId }).populate([
-      { path: "DriverId", select: "ExperienceLevel" },
-      {
-        path: "Ratings",
-        select: "_id Score Comment",
-        populate: { path: "User", select: "FirstName LastName" },
-      },
-    ]);
-
+    const driver = await User.findById({ _id: driverId });
     if (!driver) {
       return res.status(500).json({ message: "Error finding the driver" });
     }
+    const driverRatings = driver.Ratings.filter((rating) => {
+      if (rating.userRole === 1) {
+        return rating;
+      }
+    });
+
     return res.status(201).json({
       age: driver.Age,
-      experienceLevel: driver.DriverId.ExperienceLevel,
-      verificationStatus: driver.VerificationStatus,
+      experienceLevel: driver.DriverData.ExperienceLevel,
+      verificationStatus: {
+        CNIC: driver.VerificationStatus.CNIC,
+        DrivingLicense: driver.VerificationStatus.License,
+      },
       bio: driver.Bio,
       memberSince: driver.MemberSince,
-      ratings: driver.Ratings,
+      ratings: driverRatings,
     });
   } catch (e) {
     console.log(e.message);

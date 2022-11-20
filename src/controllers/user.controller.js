@@ -2,6 +2,8 @@ const User = require("../models/user.model");
 const Ride = require("../models/ride.model");
 const Rating = require("../models/rating.model");
 
+const mongoose = require("mongoose");
+
 const storeImage = require("../helpers/storeImageToServer").storeImage;
 
 exports.getUser = async (req, res) => {
@@ -27,7 +29,7 @@ exports.uploadProfilePicture = async (req, res) => {
       return res.status(201).json({ message: "Error finding user account" });
     }
 
-    const phoneNumber = user.PhoneNumber;
+    const phoneNumber = user.phoneNumber;
     let directory = "uploads/images/" + phoneNumber + "/profilepicture/";
     const imagePath = storeImage("profilepicture.png", buffer, directory);
 
@@ -86,16 +88,17 @@ exports.addCar = async (req, res) => {
     const { licensePlateNumber, brand, modelName, modelYear, colour } =
       req.body;
 
-    user.DriverData.Cars.push({
-      LicensePlateNumber: licensePlateNumber,
-      Brand: brand,
-      ModelName: modelName,
-      ModelYear: modelYear,
-      Colour: colour,
+    user.driverData.cars.push({
+      $inc: { id: 1 },
+      licensePlateNumber,
+      brand,
+      modelName,
+      modelYear,
+      colour,
     });
 
-    if (user.UserType !== true) {
-      user.UserType = true;
+    if (user.userType !== true) {
+      user.userType = true;
     }
 
     user = await user.save();
@@ -107,7 +110,6 @@ exports.addCar = async (req, res) => {
 
     return res.status(201).json({
       message: "Car Added!",
-      carId: carId,
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -253,7 +255,7 @@ exports.addBio = async (req, res) => {
   try {
     const bio = req.body.bio;
     const userId = req.user;
-    const user = await User.findOneAndUpdate({ _id: userId }, { Bio: bio });
+    const user = await User.findOneAndUpdate({ _id: userId }, { bio: bio });
     if (!user) {
       return res.status(400).json({
         message: "An Error occoured while adding bio!",
@@ -276,7 +278,7 @@ exports.addPreferences = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { _id: userId },
       {
-        Preferences: {
+        preferences: {
           smoking: smoking,
           music: music,
           pets: pets,
@@ -303,22 +305,20 @@ exports.deleteCar = async (req, res) => {
     const carId = String(req.params.carid);
 
     const userId = req.user;
-    const car = await Car.findById({ _id: carId });
-    if (!car) {
-      return res.status(404).json({ message: "Car not found!" });
-    }
+    let user = await User.findById({ _id: userId });
+    console.log(user);
+    // user = await User.findOneAndUpdate(
+    //   { _id: userId },
+    //   { driverData: { cars: { $pull: { _id: carId } } } }
+    // );
 
-    const user = await User.findOneAndUpdate(
-      { UserId: userId },
-      { $pull: { Cars: carId } }
+    user = await User.findByIdAndUpdate(
+      { _id: userId },
+      { driverData: {cars: { $pull:  { _id: carId } } } }
     );
+    console.log(user);
 
     if (!user) {
-      return res.status(500).json({ message: "Can't delete car!" });
-    }
-
-    const deletedCar = await Car.findByIdAndDelete({ _id: car });
-    if (!deletedCar) {
       return res.status(500).json({ message: "Can't delete car!" });
     }
 

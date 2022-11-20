@@ -90,7 +90,7 @@ const RideSchema = new mongoose.Schema({
     {
       id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "user.model",
       },
       seats: {
         type: Number,
@@ -100,7 +100,7 @@ const RideSchema = new mongoose.Schema({
 
   rating: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Rating",
+    ref: "rating.model",
   },
 
   offers: [
@@ -109,22 +109,22 @@ const RideSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
       },
 
-      Price: {
+      price: {
         type: Number,
         required: true,
       },
 
-      Seats: {
+      seats: {
         type: Number,
         required: true,
       },
 
-      OfferStatus: {
+      offerStatus: {
         type: String,
         default: "Pending",
       },
 
-      OfferedBy: {
+      offeredBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },

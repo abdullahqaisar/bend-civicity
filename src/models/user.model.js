@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ObjectId } = require("mongodb");
 
 const ValidateEmail = (email) => {
   const re =
@@ -7,39 +8,39 @@ const ValidateEmail = (email) => {
 };
 
 const UserSchema = new mongoose.Schema({
-  FirstName: {
+  firstName: {
     type: String,
     required: true,
   },
 
-  LastName: {
+  lastName: {
     type: String,
     required: true,
   },
 
-  Email: {
+  email: {
     type: String,
     required: true,
     unique: true,
     validate: [ValidateEmail, "Please fill a valid email address"],
   },
 
-  PhoneNumber: {
+  phoneNumber: {
     type: String,
     required: true,
     unique: true,
   },
 
-  Age: {
+  age: {
     type: Number,
   },
 
-  Bio: {
+  bio: {
     type: String,
     default: "",
   },
 
-  Preferences: {
+  preferences: {
     smoking: {
       type: Number,
     },
@@ -51,24 +52,24 @@ const UserSchema = new mongoose.Schema({
     },
   },
 
-  ActiveRide: {
+  activeRide: {
     type: Boolean,
     default: false,
   },
 
-  ActiveRideId: {
+  activeRideId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Ride",
   },
 
-  Ratings: [
+  ratings: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Rating",
     },
   ],
 
-  Images: {
+  images: {
     Profile: {
       type: String,
     },
@@ -85,104 +86,106 @@ const UserSchema = new mongoose.Schema({
   },
 
   //false for user, true for driver
-  UserType: {
+  userType: {
     type: Boolean,
     default: false,
   },
 
   //0 for not provided, 1 for pending, 2 for verified
-  VerificationStatus: {
-    CNIC: {
+  verificationStatus: {
+    cnic: {
       type: Number,
       default: 0,
     },
-    PhoneNumber: {
+    phoneNumber: {
       type: Number,
       default: 2,
     },
-    Email: {
+    email: {
       type: Number,
       default: 0,
     },
-    License: {
+    license: {
       type: Number,
       default: 0,
     },
   },
 
-  RidesTaken: [
+  ridesTaken: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Ride",
     },
   ],
 
-  MemberSince: {
+  memberSince: {
     type: Date,
     default: Date.now,
   },
 
-  DriverData: {
+  driverData: {
     ExperienceLevel: {
       type: String,
     },
 
-    Rides: [
+    rides: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Ride",
+        ref: "ride.model",
       },
     ],
 
-    Cars: [
+    cars: [
       {
-        id: {
-          type: mongoose.Schema.Types.ObjectId,
+        id: { 
+          type: Number,
+          unique: true,
+          min: 1 
         },
 
-        LicensePlateNumber: {
+        licensePlateNumber: {
           type: String,
         },
 
-        Brand: {
+        brand: {
           type: String,
         },
 
-        ModelYear: {
+        modelYear: {
           type: Number,
         },
 
-        Colour: {
+        colour: {
           type: String,
         },
 
-        ModelName: {
+        modelName: {
           type: String,
         },
 
-        IsCarInRide: {
+        isCarInRide: {
           type: Boolean,
           default: false,
         },
 
-        Rides: {
+        rides: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Ride",
         },
 
-        Images: {
-          CarImage: {
+        images: {
+          carImage: {
             type: String,
             data: Buffer,
             contentType: String,
           },
-          CopyFrontImage: {
+          copyFrontImage: {
             path: String,
             data: Buffer,
             contentType: String,
           },
 
-          CopyBackImage: {
+          copyBackImage: {
             path: String,
             data: Buffer,
             contentType: String,

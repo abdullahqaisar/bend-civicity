@@ -2,24 +2,24 @@ const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 
 const MessageSchema = new mongoose.Schema({
-  Message: {
+  message: {
     type: String,
     required: true,
   },
 
-  From: {
+  from: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
 
-  To: {
+  to: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
 
-  SentAt: {
+  sentAt: {
     type: Date,
     default: Date.now,
   },
