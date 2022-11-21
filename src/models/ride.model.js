@@ -83,7 +83,7 @@ const RideSchema = new mongoose.Schema({
 
   car: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Car",
+    ref: "car.model",
   },
 
   passengers: [

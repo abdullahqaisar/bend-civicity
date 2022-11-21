@@ -42,7 +42,6 @@ exports.offerRide = async (req, res) => {
 
 exports.publishRide = async (req, res) => {
   try {
-
     const userId = req.user;
     const {
       startLat,
@@ -62,10 +61,12 @@ exports.publishRide = async (req, res) => {
     if (!user) {
       return res.status(400).json({ msg: "User not found" });
     }
+    
+
 
     //find the car by carId from user
-    const car = user.cars.findOne((car) => car._id == carId);
-    console.log(car);
+    // const car = await User.driverData.cars.findById({ _id: userId }, {driverData.cars: {id: carId});
+
     if (!car) {
       return res.status(400).json({ msg: "Car not found" });
     }
@@ -106,21 +107,9 @@ exports.publishRide = async (req, res) => {
         message: "Error adding a ride!",
       });
     }
+
     console.log("RideId is " + ride._id);
 
-    car = await Car.findOneAndUpdate(
-      { _id: carId },
-      { $push: { Rides: ride._id } }
-    );
-
-    car.IsCarInRide = true;
-    car = await car.save();
-
-    if (!car) {
-      return res.status(400).json({
-        message: "Error adding the ride!",
-      });
-    }
     return res.status(201).json({
       message: "Ride Added!",
     });
@@ -139,8 +128,8 @@ exports.startRide = async (req, res) => {
 
   const user = await User.findByIdAndUpdate(
     { _id: userId },
-    { ActiveRide: true },
-    { ActiveRideId: rideId }
+    { activeRide: true },
+    { activeRideId: rideId }
   );
 
   // Add the ride to the all user's active rides Here
@@ -169,8 +158,8 @@ exports.priceOffers = async (req, res) => {
       });
     }
     let userRide = await Offer.findOne({
-      Ride: rideId,
-      User: userId,
+      ride: rideId,
+      user: userId,
     });
     if (userRide) {
       return res.status(500).json({
@@ -346,7 +335,7 @@ exports.findPassengerCompletedRides = async (req, res) => {
 
   const rides = await Ride.find({
     passengers: { id: userId },
-    RideStatus: 2,
+    status: 2,
   });
 
   if (!rides) {
@@ -407,7 +396,7 @@ exports.getDriverDetails = async (req, res) => {
     if (!driver) {
       return res.status(500).json({ message: "Error finding the driver" });
     }
-    const driverRatings = driver.Ratings.filter((rating) => {
+    const driverRatings = driver.ratings.filter((rating) => {
       if (rating.userRole === 1) {
         return rating;
       }
@@ -415,13 +404,13 @@ exports.getDriverDetails = async (req, res) => {
 
     return res.status(201).json({
       age: driver.Age,
-      experienceLevel: driver.DriverData.ExperienceLevel,
+      experienceLevel: driver.DriverData.experienceLevel,
       verificationStatus: {
-        CNIC: driver.VerificationStatus.CNIC,
-        DrivingLicense: driver.VerificationStatus.License,
+        cnic: driver.verificationStatus.cnic,
+        drivingLicense: driver.VerificationStatus.license,
       },
-      bio: driver.Bio,
-      memberSince: driver.MemberSince,
+      bio: driver.bio,
+      memberSince: driver.memberSince,
       ratings: driverRatings,
     });
   } catch (e) {
@@ -473,15 +462,19 @@ exports.cancelRide = async (req, res) => {
   const { rideId } = req.body;
   const ride = await Ride.findByIdAndUpdate(
     { _id: rideId },
-    { Cancelled: true }
+    { status: 3 }
   );
   if (!ride) {
     return res.status(500).json({ message: "Error cancelling the ride" });
   }
 
+
+  //increase the booking seats and stuff not update isCarInRide
+
+
   const car = await Car.findByIdAndUpdate(
     { _id: ride.Car },
-    { IsCarInRide: false }
+    { isCarInRide: false }
   );
 
   if (!car) {
@@ -547,8 +540,7 @@ exports.completeRide = async (req, res) => {
     const { rideId, userId, carId } = req.body;
     const ride = await Ride.findOneAndUpdate(
       { _id: rideId },
-      { RideStatus: false },
-      { Completed: true }
+      { status: 2 },
     );
     if (!ride) {
       return res.status(400).json({
@@ -557,7 +549,7 @@ exports.completeRide = async (req, res) => {
     }
     const car = await Car.findByIdAndUpdate(
       { _id: carId },
-      { IsCarInRide: false }
+      { isCarInRide: false }
     );
     if (!car) {
       return res.status(500).json({

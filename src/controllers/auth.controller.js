@@ -15,7 +15,7 @@ exports.signup = async (req, res) => {
   try {
     let { firstName, lastName, email, phoneNumber, age, cnicBack, cnicFront } =
       req.body;
-    const newUser = new User({
+    let newUser = await new User({
       firstName,
       lastName,
       email,
@@ -36,14 +36,14 @@ exports.signup = async (req, res) => {
     // }
     newUser.CnicFront = cnicFront;
     newUser.CnicBack = cnicBack;
-    const userCreated = await newUser.save();
-    if (!userCreated) {
+    newUser = await newUser.save();
+    if (!newUser) {
       return res.status(500).json({ msg: "User not saved!" });
     }
     const token = await jwt.sign(
       {
         phoneNumber: phoneNumber,
-        userId: userCreated._id,
+        userId: newUser._id,
       },
       process.env.JWT_KEY
     );

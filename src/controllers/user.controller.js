@@ -1,5 +1,8 @@
 const User = require("../models/user.model");
 const Ride = require("../models/ride.model");
+const Car = require("../models/car.model");
+const { ObjectId } = require("mongodb");
+
 const Rating = require("../models/rating.model");
 
 const mongoose = require("mongoose");
@@ -88,8 +91,7 @@ exports.addCar = async (req, res) => {
     const { licensePlateNumber, brand, modelName, modelYear, colour } =
       req.body;
 
-    user.driverData.cars.push({
-      $inc: { id: 1 },
+    let car = new Car({
       licensePlateNumber,
       brand,
       modelName,
@@ -97,11 +99,18 @@ exports.addCar = async (req, res) => {
       colour,
     });
 
+    car = await car.save();
+
+    if (!car) {
+      return res.status(401).json({ message: "Error adding car" });
+    }
+
     if (user.userType !== true) {
       user.userType = true;
     }
-
+    user.driverData.cars.push(car._id);
     user = await user.save();
+
     if (!user) {
       return res.status(500).json({
         message: "Error adding car!",
@@ -121,11 +130,14 @@ exports.getAllAddedCar = async (req, res) => {
     const userId = req.user;
 
     //only select cars from user
-    const cars = User.findById({ _id: userId }).select("DriverData.Cars");
-    if (!cars) {
+    const user = await User.findById({ _id: userId }).populate(
+      "driverData.cars"
+    );
+    if (!user) {
       return res.status(500).json({ message: "Error finding Driver" });
     }
-    return res.status(201).json({ cars: cars });
+
+    return res.status(201).json({ cars: user.driverData.cars });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -137,24 +149,24 @@ exports.getDriverRating = async (req, res) => {
     const userId = req.user;
 
     const user = await User.findById({ _id: userId }).populate({
-      path: "Ratings",
-      match: { UserRole: 1 },
+      path: "ratings",
+      match: { userRole: 1 },
     });
     if (!user) {
       return res.status(401).json({ message: "Error finding user account" });
     }
 
-    const count = Object.keys(user.Ratings).length;
+    const count = Object.keys(user.ratings).length;
     let sum = 0;
 
     console.log(count);
     for (let i = 0; i < count; i++) {
-      sum += user.Ratings[i].Score;
+      sum += user.ratings[i].Score;
     }
     const averageRating = sum / count;
     return res
       .status(201)
-      .json({ averageRating: averageRating, ratings: user.Ratings });
+      .json({ averageRating: averageRating, ratings: user.ratings });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
@@ -163,7 +175,7 @@ exports.getDriverRating = async (req, res) => {
 exports.getPublishedRides = async (req, res) => {
   try {
     const userId = req.params.id;
-    const data = await Ride.find({ Driver: userId });
+    const data = await Ride.find({ driver: userId });
     if (!data) {
       return res.status(201).json({
         message: "No rides found!",
@@ -302,27 +314,13 @@ exports.addPreferences = async (req, res) => {
 
 exports.deleteCar = async (req, res) => {
   try {
-    const carId = String(req.params.carid);
+    const carId = req.params.carid;
 
-    const userId = req.user;
-    let user = await User.findById({ _id: userId });
-    console.log(user);
-    // user = await User.findOneAndUpdate(
-    //   { _id: userId },
-    //   { driverData: { cars: { $pull: { _id: carId } } } }
-    // );
-
-    user = await User.findByIdAndUpdate(
-      { _id: userId },
-      { driverData: {cars: { $pull:  { _id: carId } } } }
-    );
-    console.log(user);
-
-    if (!user) {
+    const car = await Car.remove({ _id: carId });
+    if (!car) {
       return res.status(500).json({ message: "Can't delete car!" });
     }
-
-    return res.status(200).json({ message: "Car deleted!" });
+    return res.status(201).json({ message: "Car deleted!" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

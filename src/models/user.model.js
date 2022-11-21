@@ -69,6 +69,12 @@ const UserSchema = new mongoose.Schema({
     },
   ],
 
+  //false for user, true for driver
+  userType: {
+    type: Boolean,
+    default: false,
+  },
+
   images: {
     Profile: {
       type: String,
@@ -83,12 +89,6 @@ const UserSchema = new mongoose.Schema({
     License: {
       type: String,
     },
-  },
-
-  //false for user, true for driver
-  userType: {
-    type: Boolean,
-    default: false,
   },
 
   //0 for not provided, 1 for pending, 2 for verified
@@ -124,73 +124,21 @@ const UserSchema = new mongoose.Schema({
   },
 
   driverData: {
-    ExperienceLevel: {
+    experienceLevel: {
       type: String,
     },
 
     rides: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "ride.model",
+        ref: "Ride",
       },
     ],
 
     cars: [
       {
-        id: { 
-          type: Number,
-          unique: true,
-          min: 1 
-        },
-
-        licensePlateNumber: {
-          type: String,
-        },
-
-        brand: {
-          type: String,
-        },
-
-        modelYear: {
-          type: Number,
-        },
-
-        colour: {
-          type: String,
-        },
-
-        modelName: {
-          type: String,
-        },
-
-        isCarInRide: {
-          type: Boolean,
-          default: false,
-        },
-
-        rides: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Ride",
-        },
-
-        images: {
-          carImage: {
-            type: String,
-            data: Buffer,
-            contentType: String,
-          },
-          copyFrontImage: {
-            path: String,
-            data: Buffer,
-            contentType: String,
-          },
-
-          copyBackImage: {
-            path: String,
-            data: Buffer,
-            contentType: String,
-          },
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Car",
       },
     ],
   },
