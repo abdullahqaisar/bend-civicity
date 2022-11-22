@@ -2,11 +2,11 @@ const Car = require("../models/stored-car.model");
 
 exports.addCar = async (req, res) => {
   try {
-    const { carBrand, carModelName, carModelYear } = req.body;
+    const { brand, modelName, modelYear } = req.body;
     const newCar = new Car({
-      CarBrand: carBrand,
-      CarModelName: carModelName,
-      CarModelYear: carModelYear,
+      brand,
+      modelName,
+      modelYear,
     });
 
     console.log(newCar);
@@ -44,7 +44,7 @@ exports.getCarsByBrand = async (req, res) => {
   try {
     const brand = req.params.carbrand;
     const carBrand = await Car.find({
-      CarBrand: brand,
+      brand,
     });
     if (!carBrand) {
       return res.status(401).json({
