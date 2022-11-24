@@ -10,12 +10,16 @@ exports.getMessages = async (req, res) => {
 };
 
 exports.sendMessage = async (req, res) => {
-  const message = new Message(req.body);
   try {
-    const newMessage = await message.save();
+    const userId = req.user;
+    const { to, message } = req.body;
+    const newMessage = new Message({ from: userId, to, message });
+    newMessage = await newMessage.save();
+    if (!newMessage) {
+      return res.status(500).json({ message: "Message not sent" });
+    }
     res.status(201).json(newMessage);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-}
- 
+};
