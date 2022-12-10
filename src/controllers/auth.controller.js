@@ -87,10 +87,10 @@ exports.checkAccount = async (req, res) => {
       bio: user.bio,
       rating: user.ratings,
       verificationStatus: {
-        cnic: user.VerificationStatus.cnic,
-        drivingLicense: user.VerificationStatus.license,
-        email: user.VerificationStatus.email,
-        phoneNumber: user.VerificationStatus.phoneNumber,
+        cnic: user.verificationStatus.cnic,
+        drivingLicense: user.verificationStatus.license,
+        email: user.verificationStatus.email,
+        phoneNumber: user.verificationStatus.phoneNumber,
       },
     });
   } catch (e) {
