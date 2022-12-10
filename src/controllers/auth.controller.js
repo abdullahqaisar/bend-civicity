@@ -60,7 +60,9 @@ exports.signup = async (req, res) => {
 exports.checkAccount = async (req, res) => {
   try {
     const { phoneNumber } = req.body;
-    const user = await User.findOne({ phoneNumber: phoneNumber }).populate("Ratings");
+    const user = await User.findOne({ phoneNumber: phoneNumber }).populate(
+      "Ratings"
+    );
     if (!user) {
       return res
         .status(401)
@@ -74,9 +76,7 @@ exports.checkAccount = async (req, res) => {
       process.env.JWT_KEY
     );
 
-
     ///////User Login, ADD Driver Login too///////////////////////////
-
 
     return res.status(201).json({
       message: "Login successful!",
@@ -87,10 +87,10 @@ exports.checkAccount = async (req, res) => {
       bio: user.bio,
       rating: user.ratings,
       verificationStatus: {
-        cnic: driver.VerificationStatus.cnic,
-        drivingLicense: driver.VerificationStatus.license,
-        email: driver.VerificationStatus.email,
-        phoneNumber: driver.VerificationStatus.phoneNumber,
+        cnic: user.VerificationStatus.cnic,
+        drivingLicense: user.VerificationStatus.license,
+        email: user.VerificationStatus.email,
+        phoneNumber: user.VerificationStatus.phoneNumber,
       },
     });
   } catch (e) {
