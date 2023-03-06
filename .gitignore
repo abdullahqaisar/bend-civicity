@@ -1,2 +1,6 @@
 node_modules
 uploads
+
+# Env
+.env
+./env
