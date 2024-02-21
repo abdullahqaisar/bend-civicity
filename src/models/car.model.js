@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const User = require("../models/user.model");
+const mongoose = require('mongoose');
+const User = require('./user.model');
 
 function removeLinkedDocuments() {
   // car ref will be the removed from person doc
@@ -34,7 +34,7 @@ const CarSchema = new mongoose.Schema({
 
   rides: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Ride",
+    ref: 'Ride',
   },
 
   images: {
@@ -57,7 +57,7 @@ const CarSchema = new mongoose.Schema({
   },
 });
 
-CarSchema.post("remove", removeLinkedDocuments);
+CarSchema.post('remove', removeLinkedDocuments);
 
-const Car = mongoose.model("Car", CarSchema);
+const Car = mongoose.model('Car', CarSchema);
 module.exports = Car;
