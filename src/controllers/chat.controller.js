@@ -1,4 +1,4 @@
-const Message = require("../models/message.model");
+const Message = require('../models/message.model');
 
 exports.getMessages = async (req, res) => {
   try {
@@ -16,7 +16,7 @@ exports.sendMessage = async (req, res) => {
     const newMessage = new Message({ from: userId, to, message });
     newMessage = await newMessage.save();
     if (!newMessage) {
-      return res.status(500).json({ message: "Message not sent" });
+      return res.status(500).json({ message: 'Message not sent' });
     }
     res.status(201).json(newMessage);
   } catch (error) {
@@ -35,4 +35,4 @@ exports.getUserMessage = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
