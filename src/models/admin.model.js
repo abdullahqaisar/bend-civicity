@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const Admin = new mongoose.Schema({
   email: {
@@ -15,4 +15,4 @@ const Admin = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Admin", Admin);
+module.exports = mongoose.model('Admin', Admin);

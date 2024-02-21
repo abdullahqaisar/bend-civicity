@@ -1,19 +1,19 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
-require("dotenv").config();
+require('dotenv').config();
 
-const Admin = require("../models/admin.model");
-const User = require("../models/user.model");
-const Ride = require("../models/ride.model");
+const Admin = require('../models/admin.model');
+const User = require('../models/user.model');
+const Ride = require('../models/ride.model');
 
-const convertImage = require("../helpers/convertImageToBase64").convertImage;
+const { convertImage } = require('../helpers/convertImageToBase64');
 
 exports.image = async (req, res) => {
   try {
-    const path = "uploads/images/03343046353/cnic/CnicBack.png";
+    const path = 'uploads/images/03343046353/cnic/CnicBack.png';
     let buffer = await convertImage(path);
-    buffer = "data:image/png;base64," + i;
+    buffer = `data:image/png;base64,${i}`;
     return res.status(200).json({
       image: buffer,
     });
@@ -24,11 +24,13 @@ exports.image = async (req, res) => {
 
 exports.signup = async (req, res) => {
   try {
-    const { email, password, firstName, lastName } = req.body;
+    const {
+      email, password, firstName, lastName,
+    } = req.body;
     let admin = await Admin.findOne({ Email: email });
     if (admin) {
       return res.status(400).json({
-        message: "Admin already exists!",
+        message: 'Admin already exists!',
       });
     }
 
@@ -41,11 +43,11 @@ exports.signup = async (req, res) => {
     admin = await admin.save();
     if (!admin) {
       return res.status(401).json({
-        message: "Error adding an admin!",
+        message: 'Error adding an admin!',
       });
     }
     return res.status(201).json({
-      message: "Admin Added!",
+      message: 'Admin Added!',
     });
   } catch (e) {
     console.log(e.message);
@@ -56,16 +58,16 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    let admin = await Admin.findOne({ Email: email });
+    const admin = await Admin.findOne({ Email: email });
     if (!admin) {
       return res.status(400).json({
-        message: "Admin does not exist!",
+        message: 'Admin does not exist!',
       });
     }
     const isMatch = await bcrypt.compare(password, admin.Password);
     if (!isMatch) {
       return res.status(400).json({
-        message: "Incorrect Password!",
+        message: 'Incorrect Password!',
       });
     }
     const payload = {
@@ -84,7 +86,7 @@ exports.login = async (req, res) => {
         res.status(200).json({
           token,
         });
-      }
+      },
     );
   } catch (e) {
     console.log(e.message);
@@ -98,11 +100,11 @@ exports.deleteAdmin = async (req, res) => {
     const admin = await Admin.findOneAndDelete({ Email: email });
     if (!admin) {
       return res.status(400).json({
-        message: "Admin not found!",
+        message: 'Admin not found!',
       });
     }
     return res.status(200).json({
-      message: "Admin deleted!",
+      message: 'Admin deleted!',
     });
   } catch (e) {
     console.log(e.message);
@@ -115,7 +117,7 @@ exports.getAllUsers = async (req, res) => {
     const users = await User.find();
     if (!users) {
       return res.status(400).json({
-        message: "No users found!",
+        message: 'No users found!',
       });
     }
     return res.status(200).json({
@@ -133,7 +135,7 @@ exports.findSingleUser = async (req, res) => {
     const user = await User.findOne({ _id: userId });
     if (!user) {
       return res.status(400).json({
-        message: "User not found!",
+        message: 'User not found!',
       });
     }
     return res.status(200).json({
@@ -150,7 +152,7 @@ exports.getAllRides = async (req, res) => {
     const rides = await Ride.find();
     if (!rides) {
       return res.status(400).json({
-        message: "No rides found!",
+        message: 'No rides found!',
       });
     }
     return res.status(200).json({
@@ -168,7 +170,7 @@ exports.getSingleRide = async (req, res) => {
     const ride = await Ride.findOne({ _id: rideId });
     if (!ride) {
       return res.status(400).json({
-        message: "Ride not found!",
+        message: 'Ride not found!',
       });
     }
     return res.status(200).json({

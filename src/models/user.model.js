@@ -1,9 +1,8 @@
-const mongoose = require("mongoose");
-const { ObjectId } = require("mongodb");
+const mongoose = require('mongoose');
+const { ObjectId } = require('mongodb');
 
 const ValidateEmail = (email) => {
-  const re =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 };
 
@@ -22,7 +21,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    validate: [ValidateEmail, "Please fill a valid email address"],
+    validate: [ValidateEmail, 'Please fill a valid email address'],
   },
 
   phoneNumber: {
@@ -37,7 +36,7 @@ const UserSchema = new mongoose.Schema({
 
   bio: {
     type: String,
-    default: "",
+    default: '',
   },
 
   preferences: {
@@ -59,17 +58,17 @@ const UserSchema = new mongoose.Schema({
 
   activeRideId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Ride",
+    ref: 'Ride',
   },
 
   ratings: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Rating",
+      ref: 'Rating',
     },
   ],
 
-  //false for user, true for driver
+  // false for user, true for driver
   userType: {
     type: Boolean,
     default: false,
@@ -91,7 +90,7 @@ const UserSchema = new mongoose.Schema({
     },
   },
 
-  //0 for not provided, 1 for pending, 2 for verified
+  // 0 for not provided, 1 for pending, 2 for verified
   verificationStatus: {
     cnic: {
       type: Number,
@@ -114,7 +113,7 @@ const UserSchema = new mongoose.Schema({
   ridesTaken: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Ride",
+      ref: 'Ride',
     },
   ],
 
@@ -131,18 +130,18 @@ const UserSchema = new mongoose.Schema({
     rides: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Ride",
+        ref: 'Ride',
       },
     ],
 
     cars: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Car",
+        ref: 'Car',
       },
     ],
   },
 });
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model('User', UserSchema);
 module.exports = User;

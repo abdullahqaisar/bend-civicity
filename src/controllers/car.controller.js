@@ -1,4 +1,4 @@
-const Car = require("../models/stored-car.model");
+const Car = require('../models/stored-car.model');
 
 exports.addCar = async (req, res) => {
   try {
@@ -13,11 +13,11 @@ exports.addCar = async (req, res) => {
     car = await newCar.save();
     if (!car) {
       return res.status(401).json({
-        message: "Error adding a car!",
+        message: 'Error adding a car!',
       });
     }
     return res.status(201).json({
-      message: "Car Added!",
+      message: 'Car Added!',
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -26,11 +26,11 @@ exports.addCar = async (req, res) => {
 
 exports.getCarBrands = async (req, res) => {
   try {
-    console.log("Get Car Brands");
-    const carBrands = await Car.find().distinct("CarBrand");
+    console.log('Get Car Brands');
+    const carBrands = await Car.find().distinct('CarBrand');
     if (!carBrands) {
       return res.status(401).json({
-        message: "Error getting car brands!",
+        message: 'Error getting car brands!',
       });
     }
     console.log(carBrands);
@@ -48,13 +48,13 @@ exports.getCarsByBrand = async (req, res) => {
     });
     if (!carBrand) {
       return res.status(401).json({
-        message: "Error getting car brand!",
+        message: 'Error getting car brand!',
       });
     }
 
     return res.status(201).json({
-      message: "Car Brand!",
-      carBrand: carBrand,
+      message: 'Car Brand!',
+      carBrand,
     });
   } catch (e) {
     res.status(500).json({ error: e.message });

@@ -1,9 +1,8 @@
-const User = require("../models/user.model");
-const Ride = require("../models/ride.model");
-const Rating = require("../models/rating.model");
+const User = require('../models/user.model');
+const Ride = require('../models/ride.model');
+const Rating = require('../models/rating.model');
 
-var calculateDistance =
-  require("../helpers/calculateDistanceFromCoordinates").calculateDistance;
+const { calculateDistance } = require('../helpers/calculateDistanceFromCoordinates');
 
 // When user clicks on Offer Ride Button
 exports.offerRide = async (req, res) => {
@@ -13,29 +12,29 @@ exports.offerRide = async (req, res) => {
 
     if (!user) {
       return res.status(500).json({
-        message: "Error finding the user",
+        message: 'Error finding the user',
       });
     }
     if (user.VerificationStatus.CNIC === 0) {
       return res.status(401).json({
-        message: "You are not verified yet",
+        message: 'You are not verified yet',
       });
     }
     if (user.VerificationStatus.CNIC === 1) {
       return res.status(400).json({
-        message: "Your CNIC is pending, please wait for it to be approved.",
+        message: 'Your CNIC is pending, please wait for it to be approved.',
       });
     }
 
     if (user.VerificationStatus.CNIC === 2) {
       return res.status(201).json({
-        message: "Please proceed adding a ride!",
+        message: 'Please proceed adding a ride!',
       });
     }
   } catch (e) {
     console.log(e);
     return res.status(500).json({
-      message: "Server Error",
+      message: 'Server Error',
     });
   }
 };
@@ -59,26 +58,24 @@ exports.publishRide = async (req, res) => {
 
     const user = await User.findById({ _id: userId });
     if (!user) {
-      return res.status(400).json({ msg: "User not found" });
+      return res.status(400).json({ msg: 'User not found' });
     }
-    
 
-
-    //find the car by carId from user
+    // find the car by carId from user
     // const car = await User.driverData.cars.findById({ _id: userId }, {driverData.cars: {id: carId});
 
     if (!car) {
-      return res.status(400).json({ msg: "Car not found" });
+      return res.status(400).json({ msg: 'Car not found' });
     }
 
     if (car.isCarInRide) {
-      return res.status(400).json({ msg: "Car is already in a ride" });
+      return res.status(400).json({ msg: 'Car is already in a ride' });
     }
     const totalDistance = calculateDistance(
       startLat,
       startLong,
       dropLat,
-      dropLong
+      dropLong,
     );
 
     let ride = new Ride({
@@ -104,14 +101,14 @@ exports.publishRide = async (req, res) => {
     ride = await ride.save();
     if (!ride) {
       return res.status(401).json({
-        message: "Error adding a ride!",
+        message: 'Error adding a ride!',
       });
     }
 
-    console.log("RideId is " + ride._id);
+    console.log(`RideId is ${ride._id}`);
 
     return res.status(201).json({
-      message: "Ride Added!",
+      message: 'Ride Added!',
     });
   } catch (e) {
     console.log(e.message);
@@ -123,13 +120,13 @@ exports.startRide = async (req, res) => {
   const { rideId, userId } = req.body;
   const ride = await Ride.findByIdAndUpdate({ _id: rideId }, { Status: 1 });
   if (!ride) {
-    return res.status(500).json({ message: "Error starting the ride" });
+    return res.status(500).json({ message: 'Error starting the ride' });
   }
 
   const user = await User.findByIdAndUpdate(
     { _id: userId },
     { activeRide: true },
-    { activeRideId: rideId }
+    { activeRideId: rideId },
   );
 
   // Add the ride to the all user's active rides Here
@@ -138,7 +135,7 @@ exports.startRide = async (req, res) => {
     return res.status(500).json({ message: "Can't find the user!" });
   }
 
-  return res.status(201).json({ message: "Ride Started!" });
+  return res.status(201).json({ message: 'Ride Started!' });
 };
 
 exports.priceOffers = async (req, res) => {
@@ -148,13 +145,13 @@ exports.priceOffers = async (req, res) => {
     const ride = await Ride.findById({ _id: rideId });
     if (!ride) {
       return res.status(500).json({
-        message: "Ride not found!",
+        message: 'Ride not found!',
       });
     }
     const user = await User.findById({ _id: userId });
     if (!user) {
       return res.status(500).json({
-        message: "User not found!",
+        message: 'User not found!',
       });
     }
     let userRide = await Offer.findOne({
@@ -163,7 +160,7 @@ exports.priceOffers = async (req, res) => {
     });
     if (userRide) {
       return res.status(500).json({
-        message: "You already have an offer for this ride!",
+        message: 'You already have an offer for this ride!',
       });
     }
     userRide = new Offer({
@@ -171,16 +168,16 @@ exports.priceOffers = async (req, res) => {
       User: userId,
       Price: price,
       Seats: seats,
-      OfferStatus: "Active",
+      OfferStatus: 'Active',
     });
     userRide = await userRide.save();
     if (!userRide) {
       return res.status(500).json({
-        message: "Error adding offer!",
+        message: 'Error adding offer!',
       });
     }
     return res.status(201).json({
-      message: "Offer added!",
+      message: 'Offer added!',
     });
   } catch (e) {
     console.log(e.message);
@@ -195,13 +192,13 @@ exports.acceptOffer = async (req, res) => {
     const ride = await Ride.findById({ _id: rideId });
     if (!ride) {
       return res.status(500).json({
-        message: "Ride not found!",
+        message: 'Ride not found!',
       });
     }
     const user = await User.findById({ _id: userId });
     if (!user) {
       return res.status(500).json({
-        message: "User not found!",
+        message: 'User not found!',
       });
     }
     const userRide = await Offer.findOne({
@@ -215,24 +212,24 @@ exports.acceptOffer = async (req, res) => {
     }
     const acceptedRide = await Offer.findOneAndUpdate(
       { Ride: rideId },
-      { Accepted: true }
+      { Accepted: true },
     );
     if (!acceptedRide) {
       return res.status(500).json({
-        message: "Error accepting the offer!",
+        message: 'Error accepting the offer!',
       });
     }
     const updatedRide = await Ride.findByIdAndUpdate(
       { _id: rideId },
-      { AvailableSeats: ride.AvailableSeats - 1 }
+      { AvailableSeats: ride.AvailableSeats - 1 },
     );
     if (!updatedRide) {
       return res.status(500).json({
-        message: "Error accepting the offer!",
+        message: 'Error accepting the offer!',
       });
     }
     return res.status(201).json({
-      message: "Offer accepted!",
+      message: 'Offer accepted!',
     });
   } catch (e) {
     console.log(e.message);
@@ -246,13 +243,13 @@ exports.rejectOffer = async (req, res) => {
     const ride = await Ride.findById({ _id: rideId });
     if (!ride) {
       return res.status(500).json({
-        message: "Ride not found!",
+        message: 'Ride not found!',
       });
     }
     const user = await User.findById({ _id: userId });
     if (!user) {
       return res.status(500).json({
-        message: "User not found!",
+        message: 'User not found!',
       });
     }
     const userRide = await Offer.findOne({
@@ -266,15 +263,15 @@ exports.rejectOffer = async (req, res) => {
     }
     const rejectedRide = await Offer.findOneAndUpdate(
       { Ride: rideId },
-      { Rejected: true }
+      { Rejected: true },
     );
     if (!rejectedRide) {
       return res.status(500).json({
-        message: "Error rejecting the offer!",
+        message: 'Error rejecting the offer!',
       });
     }
     return res.status(201).json({
-      message: "Offer rejected!",
+      message: 'Offer rejected!',
     });
   } catch (e) {
     console.log(e.message);
@@ -296,24 +293,24 @@ exports.dropPassengerOnRoute = async (req, res) => {
     ride.StartLat,
     ride.StartLong,
     user.CurrentLat,
-    user.CurrentLong
+    user.CurrentLong,
   );
   const price = distance * ride.PricePerSeat;
   const user1 = await User.findByIdAndUpdate(
     { _id: userId },
-    { ActiveRide: false, Balance: user.Balance + price }
+    { ActiveRide: false, Balance: user.Balance + price },
   );
   if (!user1) {
     return res.status(500).json({ message: "Can't find the user!" });
   }
   const ride1 = await Ride.findByIdAndUpdate(
     { _id: rideId },
-    { AvailableSeats: ride.AvailableSeats + 1 }
+    { AvailableSeats: ride.AvailableSeats + 1 },
   );
   if (!ride1) {
     return res.status(500).json({ message: "Can't find the ride!" });
   }
-  return res.status(201).json({ message: "Passenger dropped!" });
+  return res.status(201).json({ message: 'Passenger dropped!' });
 };
 
 exports.findDriverCompletedRides = async (req, res) => {
@@ -324,10 +321,10 @@ exports.findDriverCompletedRides = async (req, res) => {
     status: 2,
   });
   if (!rides) {
-    return res.status(500).json({ message: "Error finding the rides" });
+    return res.status(500).json({ message: 'Error finding the rides' });
   }
 
-  return res.status(201).json({ rides: rides });
+  return res.status(201).json({ rides });
 };
 
 exports.findPassengerCompletedRides = async (req, res) => {
@@ -339,23 +336,25 @@ exports.findPassengerCompletedRides = async (req, res) => {
   });
 
   if (!rides) {
-    return res.status(500).json({ message: "Error finding the rides" });
+    return res.status(500).json({ message: 'Error finding the rides' });
   }
 
-  return res.status(201).json({ rides: rides });
+  return res.status(201).json({ rides });
 };
 
 exports.searchRides = async (req, res) => {
   try {
-    const { startLat, startLong, dropLat, dropLong } = req.body;
+    const {
+      startLat, startLong, dropLat, dropLong,
+    } = req.body;
     const rides = await Ride.find({
       status: 0,
       availableSeats: { $gt: 0 },
       // StartTime: { $gte: req.body.startTime },
-    }).populate("driver", "_id FirstName LastName ");
+    }).populate('driver', '_id FirstName LastName ');
 
     if (!rides) {
-      return res.status(500).json({ message: "Error finding rides" });
+      return res.status(500).json({ message: 'Error finding rides' });
     }
     let filteredRides = rides.filter((ride) => {
       // check if ride starting location is within 10km range
@@ -363,7 +362,7 @@ exports.searchRides = async (req, res) => {
         startLat,
         startLong,
         ride.start.latitide,
-        ride.start.longitude
+        ride.start.longitude,
       );
       if (distance <= 10) {
         return ride;
@@ -376,7 +375,7 @@ exports.searchRides = async (req, res) => {
         dropLat,
         dropLong,
         ride.drop.latitide,
-        ride.drop.longitude
+        ride.drop.longitude,
       );
       if (distance <= 10) {
         return ride;
@@ -394,7 +393,7 @@ exports.getDriverDetails = async (req, res) => {
     const driverId = req.params.driverid;
     const driver = await User.findById({ _id: driverId });
     if (!driver) {
-      return res.status(500).json({ message: "Error finding the driver" });
+      return res.status(500).json({ message: 'Error finding the driver' });
     }
     const driverRatings = driver.ratings.filter((rating) => {
       if (rating.userRole === 1) {
@@ -434,24 +433,24 @@ exports.dropOffPassenger = async (req, res) => {
       ride.StartLat,
       ride.StartLong,
       user.CurrentLat,
-      user.CurrentLong
+      user.CurrentLong,
     );
     const price = distance * ride.PricePerSeat;
     const user1 = await User.findByIdAndUpdate(
       { _id: userId },
-      { ActiveRide: false, Balance: user.Balance + price }
+      { ActiveRide: false, Balance: user.Balance + price },
     );
     if (!user1) {
       return res.status(500).json({ message: "Can't find the user!" });
     }
     const ride1 = await Ride.findByIdAndUpdate(
       { _id: rideId },
-      { AvailableSeats: ride.AvailableSeats + 1 }
+      { AvailableSeats: ride.AvailableSeats + 1 },
     );
     if (!ride1) {
       return res.status(500).json({ message: "Can't find the ride!" });
     }
-    return res.status(201).json({ message: "Passenger dropped!" });
+    return res.status(201).json({ message: 'Passenger dropped!' });
   } catch (e) {
     console.log(e.message);
     return res.status(500).json({ error: e.message });
@@ -462,26 +461,24 @@ exports.cancelRide = async (req, res) => {
   const { rideId } = req.body;
   const ride = await Ride.findByIdAndUpdate(
     { _id: rideId },
-    { status: 3 }
+    { status: 3 },
   );
   if (!ride) {
-    return res.status(500).json({ message: "Error cancelling the ride" });
+    return res.status(500).json({ message: 'Error cancelling the ride' });
   }
 
-
-  //increase the booking seats and stuff not update isCarInRide
-
+  // increase the booking seats and stuff not update isCarInRide
 
   const car = await Car.findByIdAndUpdate(
     { _id: ride.Car },
-    { isCarInRide: false }
+    { isCarInRide: false },
   );
 
   if (!car) {
-    return res.status(500).json({ message: "Error cancelling the ride" });
+    return res.status(500).json({ message: 'Error cancelling the ride' });
   }
 
-  return res.status(201).json({ message: "Ride Cancelled!" });
+  return res.status(201).json({ message: 'Ride Cancelled!' });
 };
 
 exports.addRating = async (req, res) => {
@@ -490,7 +487,7 @@ exports.addRating = async (req, res) => {
     const { rideId, score, comment } = req.body;
     const ride = await Ride.findById({ _id: rideId });
     if (!ride) {
-      return res.status(500).json({ message: "Error adding the rating" });
+      return res.status(500).json({ message: 'Error adding the rating' });
     }
 
     let rating = new Rating({
@@ -503,32 +500,32 @@ exports.addRating = async (req, res) => {
     rating = await rating.save();
 
     if (!rating) {
-      return res.status(500).json({ message: "Error adding the rating" });
+      return res.status(500).json({ message: 'Error adding the rating' });
     }
 
     const ride1 = await Ride.findByIdAndUpdate(
       { _id: rideId },
-      { Ratings: rating._id }
+      { Ratings: rating._id },
     );
 
     if (!ride1) {
       return res
         .status(500)
-        .json({ message: "Error adding the rating to ride" });
+        .json({ message: 'Error adding the rating to ride' });
     }
 
     const driver = await User.findByIdAndUpdate(
       { _id: ride.Driver },
-      { $push: { Ratings: rating._id } }
+      { $push: { Ratings: rating._id } },
     );
 
     if (!driver) {
       return res
         .status(500)
-        .json({ message: "Error adding the rating to driver" });
+        .json({ message: 'Error adding the rating to driver' });
     }
 
-    return res.status(201).json({ message: "Rating added!" });
+    return res.status(201).json({ message: 'Rating added!' });
   } catch (e) {
     console.log(e.message);
     return res.status(500).json({ error: e.message });
@@ -544,20 +541,20 @@ exports.completeRide = async (req, res) => {
     );
     if (!ride) {
       return res.status(400).json({
-        message: "An error occurred!",
+        message: 'An error occurred!',
       });
     }
     const car = await Car.findByIdAndUpdate(
       { _id: carId },
-      { isCarInRide: false }
+      { isCarInRide: false },
     );
     if (!car) {
       return res.status(500).json({
-        message: "Error completing ride!",
+        message: 'Error completing ride!',
       });
     }
     return res.status(201).json({
-      message: "Ride Completed!",
+      message: 'Ride Completed!',
     });
   } catch (e) {
     return res.status(500).json({ error: e.message });
