@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
@@ -24,9 +25,7 @@ exports.image = async (req, res) => {
 
 exports.signup = async (req, res) => {
   try {
-    const {
-      email, password, firstName, lastName,
-    } = req.body;
+    const { email, password, firstName, lastName } = req.body;
     let admin = await Admin.findOne({ Email: email });
     if (admin) {
       return res.status(400).json({
@@ -50,7 +49,7 @@ exports.signup = async (req, res) => {
       message: 'Admin Added!',
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -89,7 +88,7 @@ exports.login = async (req, res) => {
       },
     );
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -107,7 +106,7 @@ exports.deleteAdmin = async (req, res) => {
       message: 'Admin deleted!',
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -124,7 +123,7 @@ exports.getAllUsers = async (req, res) => {
       users,
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -142,7 +141,7 @@ exports.findSingleUser = async (req, res) => {
       user,
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -159,7 +158,7 @@ exports.getAllRides = async (req, res) => {
       rides,
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -177,7 +176,7 @@ exports.getSingleRide = async (req, res) => {
       ride,
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };

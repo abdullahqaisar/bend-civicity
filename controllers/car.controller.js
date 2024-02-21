@@ -9,7 +9,7 @@ exports.addCar = async (req, res) => {
       modelYear,
     });
 
-    console.log(newCar);
+    debug(newCar);
     car = await newCar.save();
     if (!car) {
       return res.status(401).json({
@@ -26,14 +26,14 @@ exports.addCar = async (req, res) => {
 
 exports.getCarBrands = async (req, res) => {
   try {
-    console.log('Get Car Brands');
+    debug('Get Car Brands');
     const carBrands = await Car.find().distinct('CarBrand');
     if (!carBrands) {
       return res.status(401).json({
         message: 'Error getting car brands!',
       });
     }
-    console.log(carBrands);
+    debug(carBrands);
     return res.status(201).send(carBrands);
   } catch (e) {
     res.status(500).json({ error: e.message });
