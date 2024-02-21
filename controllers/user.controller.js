@@ -87,9 +87,8 @@ exports.addCar = async (req, res) => {
     //   newUser.CnicFront = carImgPath;
     // }
 
-    const {
-      licensePlateNumber, brand, modelName, modelYear, colour,
-    } = req.body;
+    const { licensePlateNumber, brand, modelName, modelYear, colour } =
+      req.body;
 
     let car = new Car({
       licensePlateNumber,
@@ -159,14 +158,12 @@ exports.getDriverRating = async (req, res) => {
     const count = Object.keys(user.ratings).length;
     let sum = 0;
 
-    console.log(count);
+    debug(count);
     for (let i = 0; i < count; i++) {
       sum += user.ratings[i].Score;
     }
     const averageRating = sum / count;
-    return res
-      .status(201)
-      .json({ averageRating, ratings: user.ratings });
+    return res.status(201).json({ averageRating, ratings: user.ratings });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
@@ -277,7 +274,7 @@ exports.addBio = async (req, res) => {
       message: 'Bio Added!',
     });
   } catch (err) {
-    console.log(err.message);
+    debug(err.message);
     return res.status(500).json({ error: err.message });
   }
 };
@@ -286,7 +283,7 @@ exports.addPreferences = async (req, res) => {
   try {
     const userId = req.user;
     const { smoking, music, pets } = req.body;
-    console.log(req.body);
+    debug(req.body);
     const user = await User.findOneAndUpdate(
       { _id: userId },
       {
@@ -307,7 +304,7 @@ exports.addPreferences = async (req, res) => {
       message: 'Preferences Added!',
     });
   } catch (err) {
-    console.log(err.message);
+    debug(err.message);
     return res.status(500).json({ error: err.message });
   }
 };

@@ -2,7 +2,9 @@ const User = require('../models/user.model');
 const Ride = require('../models/ride.model');
 const Rating = require('../models/rating.model');
 
-const { calculateDistance } = require('../helpers/calculateDistanceFromCoordinates');
+const {
+  calculateDistance,
+} = require('../helpers/calculateDistanceFromCoordinates');
 
 // When user clicks on Offer Ride Button
 exports.offerRide = async (req, res) => {
@@ -32,7 +34,7 @@ exports.offerRide = async (req, res) => {
       });
     }
   } catch (e) {
-    console.log(e);
+    debug(e);
     return res.status(500).json({
       message: 'Server Error',
     });
@@ -105,13 +107,13 @@ exports.publishRide = async (req, res) => {
       });
     }
 
-    console.log(`RideId is ${ride._id}`);
+    debug(`RideId is ${ride._id}`);
 
     return res.status(201).json({
       message: 'Ride Added!',
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -180,7 +182,7 @@ exports.priceOffers = async (req, res) => {
       message: 'Offer added!',
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -232,7 +234,7 @@ exports.acceptOffer = async (req, res) => {
       message: 'Offer accepted!',
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -274,7 +276,7 @@ exports.rejectOffer = async (req, res) => {
       message: 'Offer rejected!',
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -344,9 +346,7 @@ exports.findPassengerCompletedRides = async (req, res) => {
 
 exports.searchRides = async (req, res) => {
   try {
-    const {
-      startLat, startLong, dropLat, dropLong,
-    } = req.body;
+    const { startLat, startLong, dropLat, dropLong } = req.body;
     const rides = await Ride.find({
       status: 0,
       availableSeats: { $gt: 0 },
@@ -383,7 +383,7 @@ exports.searchRides = async (req, res) => {
     });
     return res.status(200).json({ rides: filteredRides });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -413,7 +413,7 @@ exports.getDriverDetails = async (req, res) => {
       ratings: driverRatings,
     });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -452,17 +452,14 @@ exports.dropOffPassenger = async (req, res) => {
     }
     return res.status(201).json({ message: 'Passenger dropped!' });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
 
 exports.cancelRide = async (req, res) => {
   const { rideId } = req.body;
-  const ride = await Ride.findByIdAndUpdate(
-    { _id: rideId },
-    { status: 3 },
-  );
+  const ride = await Ride.findByIdAndUpdate({ _id: rideId }, { status: 3 });
   if (!ride) {
     return res.status(500).json({ message: 'Error cancelling the ride' });
   }
@@ -527,7 +524,7 @@ exports.addRating = async (req, res) => {
 
     return res.status(201).json({ message: 'Rating added!' });
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -535,10 +532,7 @@ exports.addRating = async (req, res) => {
 exports.completeRide = async (req, res) => {
   try {
     const { rideId, userId, carId } = req.body;
-    const ride = await Ride.findOneAndUpdate(
-      { _id: rideId },
-      { status: 2 },
-    );
+    const ride = await Ride.findOneAndUpdate({ _id: rideId }, { status: 2 });
     if (!ride) {
       return res.status(400).json({
         message: 'An error occurred!',

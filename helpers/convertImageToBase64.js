@@ -5,10 +5,10 @@ var fs = require('fs-extra');
 module.exports.convertImage = async (image) => {
   try {
     const buffer = await fs.readFileSync(image, 'base64');
-    console.log(`Convert Buffer is ${buffer}`);
+    debug(`Convert Buffer is ${buffer}`);
     return buffer;
   } catch (e) {
-    console.log(e.message);
+    debug(e.message);
     return res.status(500).json({ error: e.message });
   }
 };
