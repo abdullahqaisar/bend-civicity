@@ -1,17 +1,15 @@
 const path = require('path');
-var fs = require('fs');
-var fs = require('fs-extra');
+const fs = require('fs');
 
 module.exports.storeImage = async (fileName, buffer, Dir) => {
-  debug(`Buffer is ${buffer}`);
   const trimBuffer = await Buffer.from(buffer.split('base64,')[1], 'base64');
-  fileurl = path.join(Dir, fileName);
+  const fileurl = path.join(Dir, fileName);
   await fs.outputFile(fileurl, trimBuffer, { encoding: 'base64' }, (err) => {
-    if (err) {
-      debug(err);
-    } else {
-      debug(`${fileName} uploaded`);
-    }
+    setTimeout(() => {
+      if (err) {
+        throw err;
+      }
+    }, 1000);
   });
   const url = String(fileurl);
   return url;
