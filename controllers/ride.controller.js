@@ -298,8 +298,8 @@ exports.findPassengerCompletedRides = async (req, res) => {
   return res.status(201).json({ rides });
 };
 
-exports.searchRides = async (req, res) => {
-  const { startLat, startLong, dropLat, dropLong } = req.body;
+exports.getRides = async (req, res) => {
+  const { startLat, startLong, dropLat, dropLong } = req.query;
 
   const rides = await Ride.find({
     status: 0,
@@ -472,9 +472,9 @@ exports.addRating = async (req, res) => {
   return res.status(201).json({ message: 'Rating added!' });
 };
 
-exports.completeRide = async (req, res) => {
-  const { rideId, userId, carId } = req.body;
-  const ride = await Ride.findOneAndUpdate({ _id: rideId }, { status: 2 });
+exports.updateRide = async (req, res) => {
+  const { rideId, userId, carId, status } = req.body;
+  const ride = await Ride.findOneAndUpdate({ _id: rideId }, { status });
   if (!ride) {
     return res.status(400).json({
       message: 'An error occurred!',

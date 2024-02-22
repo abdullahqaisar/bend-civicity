@@ -8,20 +8,6 @@ const Admin = require('../models/admin.model');
 const User = require('../models/user.model');
 const Ride = require('../models/ride.model');
 
-const {
-  convertImage,
-} = require('../helpers/convertImageToBase64');
-
-exports.image = async (req, res) => {
-  const path =
-    'uploads/images/03343046353/cnic/CnicBack.png';
-  let buffer = await convertImage(path);
-  buffer = `data:image/png;base64,${i}`;
-  return res.status(200).json({
-    image: buffer,
-  });
-};
-
 exports.signup = async (req, res) => {
   const { email, password, firstName, lastName } = req.body;
 
@@ -56,29 +42,18 @@ exports.login = async (req, res) => {
 
   const admin = await Admin.findOne({ Email: email });
   if (!admin) {
-    return res
-      .status(400)
-      .json({ message: 'Admin does not exist!' });
+    return res.status(400).json({ message: 'Admin does not exist!' });
   }
 
-  const isMatch = await bcrypt.compare(
-    password,
-    admin.Password,
-  );
+  const isMatch = await bcrypt.compare(password, admin.Password);
   if (!isMatch) {
-    return res
-      .status(400)
-      .json({ message: 'Incorrect Password!' });
+    return res.status(400).json({ message: 'Incorrect Password!' });
   }
 
   const payload = { admin: { id: admin._id } };
-  const token = await jwt.sign(
-    payload,
-    process.env.JWT_KEY,
-    {
-      expiresIn: 10000,
-    },
-  );
+  const token = await jwt.sign(payload, process.env.JWT_KEY, {
+    expiresIn: 10000,
+  });
 
   return res.status(200).json({ token });
 };

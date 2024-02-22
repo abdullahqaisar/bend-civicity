@@ -6,10 +6,10 @@ const RideController = require('../controllers/ride.controller');
 
 const auth = require('../middleware/auth');
 
-router.post('/searchrides', RideController.searchRides);
-router.post('/publishride', auth, RideController.publishRide);
-router.patch('/completeride', auth, RideController.completeRide);
-router.post('/addrating', auth, RideController.addRating);
-router.get('/getDriverDetails/:driverid', auth, RideController.getDriverDetails);
-router.get('/offerRide', auth, RideController.offerRide);
+router.get('/', auth, RideController.getRides);
+router.post('/', auth, RideController.publishRide);
+router.patch('/', auth, RideController.updateRide);
+router.patch('/rate', auth, RideController.addRating);
+router.get('/:driverid', auth, RideController.getDriverDetails);
+router.put('/offerRide', auth, RideController.offerRide);
 module.exports = router;
