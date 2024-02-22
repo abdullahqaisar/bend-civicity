@@ -1,6 +1,6 @@
-# Civicity: City-to-City Carpooling App
+# Civicity: Carpooling App
 
-Civicity is a mobile application designed to facilitate city-to-city carpooling, connecting riders with drivers to provide a convenient, affordable, and sustainable transportation option. This repository contains the server-side code for Civicity, implemented in Node.js, Express.js, and MongoDB.
+Civicity is a mobile application designed to facilitate carpooling, connecting riders with drivers to provide a convenient, affordable, and sustainable transportation option. This repository contains the server-side code for Civicity, implemented in Node.js, Express.js, and MongoDB.
 
 ## Features
 
