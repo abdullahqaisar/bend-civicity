@@ -71,6 +71,18 @@ DATABASE_CONNECTION=your-mongodb-uri
 - `DATABASE_CONNECTION`: Your MongoDB connection URI.
 - `JWT_KEY`: Secret key for JWT token generation.
 
+Create a `config` folder in the project directory and create a `default.json` file in it
+
+```default.json
+{
+  "logLevel": "info",
+  "production": false
+}
+```
+
+- `logLevel`: The level of logging (Info, Debug, etc...).
+- `production`: Checks if the environment is production.
+
 ## Contributing
 
 If you'd like to contribute to the project, please follow our [Contribution Guidelines](CONTRIBUTING.md).

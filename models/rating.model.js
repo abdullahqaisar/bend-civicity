@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const ratingSchema = new mongoose.Schema({
   score: {
@@ -7,7 +7,7 @@ const ratingSchema = new mongoose.Schema({
   },
   comment: {
     type: String,
-    default: "",
+    default: '',
   },
   date: {
     type: Date,
@@ -21,8 +21,8 @@ const ratingSchema = new mongoose.Schema({
 
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
   },
 });
 
-module.exports = mongoose.model("Rating", ratingSchema);
+module.exports = mongoose.model('Rating', ratingSchema);

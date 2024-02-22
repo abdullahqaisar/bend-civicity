@@ -2,12 +2,16 @@
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",
+    "config": "^3.3.11",
     "cors": "^2.8.5",
+    "debug": "^4.3.4",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "express-async-errors": "^3.1.1",
     "firebase": "^9.9.3",
     "fs-extra": "^10.1.0",
     "fs-path": "^0.0.25",
+    "http-status": "^1.7.3",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.8.1",
     "mongoose": "^6.5.1",
@@ -15,17 +19,28 @@
     "nodemon": "^2.0.19",
     "otp-generator": "^4.0.0",
     "socket.io": "^4.5.3",
-    "twilio": "^3.80.0"
+    "twilio": "^3.80.0",
+    "winston": "^3.11.0"
   },
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "author": "",
   "license": "ISC",
   "keywords": [],
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.5"
+  }
 }

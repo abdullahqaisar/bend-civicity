@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const RideSchema = new mongoose.Schema({
   start: {
@@ -78,19 +78,19 @@ const RideSchema = new mongoose.Schema({
 
   driver: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
   },
 
   car: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "car.model",
+    ref: 'car.model',
   },
 
   passengers: [
     {
       id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user.model",
+        ref: 'user.model',
       },
       seats: {
         type: Number,
@@ -100,7 +100,7 @@ const RideSchema = new mongoose.Schema({
 
   rating: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "rating.model",
+    ref: 'rating.model',
   },
 
   offers: [
@@ -121,17 +121,17 @@ const RideSchema = new mongoose.Schema({
 
       offerStatus: {
         type: String,
-        default: "Pending",
+        default: 'Pending',
       },
 
       offeredBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     },
   ],
 });
 
-const Ride = mongoose.model("Ride", RideSchema);
+const Ride = mongoose.model('Ride', RideSchema);
 
 module.exports = Ride;

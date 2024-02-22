@@ -1,5 +1,5 @@
-const { ObjectId } = require("mongodb");
-const mongoose = require("mongoose");
+const { ObjectId } = require('mongodb');
+const mongoose = require('mongoose');
 
 const MessageSchema = new mongoose.Schema({
   message: {
@@ -9,13 +9,13 @@ const MessageSchema = new mongoose.Schema({
 
   from: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true,
   },
 
   to: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true,
   },
 
