@@ -3,10 +3,11 @@ const AdminController = require('../controllers/admin.controller');
 
 const router = express.Router();
 
-router.post('/signup', AdminController.signup);
-router.post('/login', AdminController.login);
-router.get('/getallusers', AdminController.getAllUsers);
-router.get('/getallrides', AdminController.getAllRides);
-router.get('/image', AdminController.image);
+const auth = require('../middleware/auth');
+
+router.post('/signup', auth, AdminController.signup);
+router.post('/login', auth, AdminController.login);
+router.get('/', auth, AdminController.getAllUsers);
+router.get('/rides', auth, AdminController.getAllRides);
 
 module.exports = router;
