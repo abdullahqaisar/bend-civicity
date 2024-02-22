@@ -56,7 +56,7 @@ exports.getDriverRating = async (req, res) => {
   return res.status(200).json({ averageRating, ratings: driverRatings });
 };
 
-exports.getRides = async (req, res) => {
+exports.getRidesByUser = async (req, res) => {
   const userId = req.params.id;
   const { published } = req.query;
 
@@ -77,20 +77,25 @@ exports.getRides = async (req, res) => {
   return res.status(200).send(data);
 };
 
-// find all rides that are completed and have the user as a passenger
-exports.getCompletedRides = async (req, res) => {
+exports.getRides = async (req, res) => {
   const userId = req.user;
+  const { status } = req.query;
 
-  const data = await Ride.find({
-    $and: [{ Status: 2 }, { Passengers: { $elemMatch: { _id: userId } } }],
-  });
-  if (!data) {
-    return res.status(400).json({
+  const filter = { Passengers: { $elemMatch: { _id: userId } } };
+
+  if (status !== undefined) {
+    filter.Status = parseInt(status, 10);
+  }
+
+  const data = await Ride.find(filter);
+
+  if (!data || data.length === 0) {
+    return res.status(404).json({
       message: 'No rides found!',
     });
   }
 
-  return res.status(201).send(data);
+  return res.status(200).send(data);
 };
 
 exports.uploadProfilePicture = async (req, res) => {
@@ -112,7 +117,7 @@ exports.uploadProfilePicture = async (req, res) => {
   return res.status(201).json({ message: 'Profile Picture Uploaded' });
 };
 
-exports.updateProfile = async (req, res) => {
+exports.updateUser = async (req, res) => {
   const userId = req.user;
   const { bio, smoking, music, pets } = req.query;
 
