@@ -51,9 +51,9 @@ Before you begin, make sure you have the following software installed on your sy
    ```bash
    # Start the server
    npm start
+   ```
 
-   OR
-
+   ```bash
    # Start the server with debug logs
    DEBUG=app npm start
    ```
