@@ -51,6 +51,11 @@ Before you begin, make sure you have the following software installed on your sy
    ```bash
    # Start the server
    npm start
+
+   OR
+
+   # Start the server with debug logs
+   DEBUG=app npm start
    ```
 
 5. Access the APIs at [http://localhost:PORT](http://localhost:PORT).
