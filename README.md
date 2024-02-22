@@ -76,12 +76,14 @@ Create a `config` folder in the project directory and create a `default.json` fi
 ```default.json
 {
   "logLevel": "info",
-  "production": false
+  "production": false,
+  "debugNamespace": "app"
 }
 ```
 
 - `logLevel`: The level of logging (Info, Debug, etc...).
 - `production`: Checks if the environment is production.
+- `debugNamespace`: Namespace for Debug Logs
 
 ## Contributing
 
