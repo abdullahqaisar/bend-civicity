@@ -78,7 +78,7 @@ exports.addCar = async (req, res) => {
   if (user.userType !== true) {
     user.userType = true;
   }
-  user.driverData.cars.push(car._id);
+  user.driverData.cars.push(car.id);
   user = await user.save();
 
   if (!user) {
@@ -108,23 +108,25 @@ exports.getAllAddedCar = async (req, res) => {
 exports.getDriverRating = async (req, res) => {
   const userId = req.user;
 
-  const user = await User.findById({ _id: userId }).populate({
+  const user = await User.findById(userId).populate({
     path: 'ratings',
     match: { userRole: 1 },
   });
   if (!user) {
-    return res.status(401).json({ message: 'Error finding user account' });
+    throw new Error('User not found');
   }
 
-  const count = Object.keys(user.ratings).length;
-  let sum = 0;
+  const driverRatings = user.ratings.filter((rating) => rating.userRole === 1);
 
-  for (let i = 0; i < count; i++) {
-    sum += user.ratings[i].Score;
+  if (driverRatings.length === 0) {
+    return res.status(200).json({ message: 'No driver ratings found' });
   }
-  const averageRating = sum / count;
 
-  return res.status(201).json({ averageRating, ratings: user.ratings });
+  const averageRating =
+    driverRatings.reduce((sum, rating) => sum + rating.Score, 0) /
+    driverRatings.length;
+
+  return res.status(200).json({ averageRating, ratings: driverRatings });
 };
 
 exports.getPublishedRides = async (req, res) => {
