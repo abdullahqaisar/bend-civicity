@@ -59,6 +59,7 @@ exports.getCars = async (req, res) => {
   if (!user) {
     return res.status(500).json({ message: 'Error finding Driver' });
   }
+
   return res.status(200).json({ cars: user.driverData.cars });
 };
 
@@ -69,5 +70,6 @@ exports.deleteCar = async (req, res) => {
   if (!car) {
     return res.status(500).json({ message: "Can't delete car!" });
   }
+
   return res.status(201).json({ message: 'Car deleted!' });
 };
